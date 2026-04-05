@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +8,9 @@
 <style>
 body {
 margin: 0;
+font-family: 'Segoe UI', sans-serif;
 background: linear-gradient(135deg, #ff4b7d, #ff758c);
 color: white;
-font-family: Arial, sans-serif;
 text-align: center;
 overflow: hidden;
 }
@@ -23,34 +23,69 @@ font-weight: bold;
 animation: fade 1s ease;
 }
 
-/* Main content */
+/* Main */
 #main {
 display: none;
 padding: 20px;
+animation: fade 2s ease;
 }
 
 h1 {
-font-size: 28px;
-margin-top: 20px;
+font-size: 32px;
+margin-top: 10px;
 }
 
 /* Image */
 img {
-width: 80%;
-max-width: 300px;
-height: auto;
+width: 85%;
+max-width: 320px;
 border-radius: 20px;
 margin-top: 20px;
-box-shadow: 0 0 20px rgba(0,0,0,0.4);
+box-shadow: 0 0 30px rgba(0,0,0,0.5);
+transition: transform 0.5s ease;
+}
+
+img:hover {
+transform: scale(1.05);
 }
 
 /* Message */
 p {
 font-size: 18px;
-margin-top: 10px;
+margin-top: 15px;
+line-height: 1.5;
 }
 
-/* Fade animation */
+/* Button */
+button {
+margin-top: 20px;
+padding: 10px 20px;
+border: none;
+border-radius: 20px;
+background: white;
+color: #ff4b7d;
+font-weight: bold;
+cursor: pointer;
+transition: 0.3s;
+}
+
+button:hover {
+background: #ffe3ec;
+}
+
+/* Floating hearts */
+.heart {
+position: absolute;
+color: pink;
+animation: float 5s linear infinite;
+}
+
+@keyframes float {
+0% {transform: translateY(100vh); opacity: 1;}
+100% {transform: translateY(-10vh); opacity: 0;}
+}
+
+/* Fade */
 @keyframes fade {
 from {opacity: 0;}
 to {opacity: 1;}
@@ -65,8 +100,20 @@ to {opacity: 1;}
 
 <div id="main">
 <h1>🎉 Happy Birthday 🎉</h1>
-<p>Urime ditëlindja! 🎂 Je shumë i/e veçantë ❤️</p>
-<img id="photo" src="foto1.jpg">
+
+<p>
+Happy Birthday to the most amazing person 💖<br><br>
+You are not just a friend, you are a piece of my happiness, my safe place,  
+and one of the best things life has given me.<br><br>
+I hope your day is filled with love, laughter, and unforgettable moments.  
+You truly deserve the world 🌍✨<br><br>
+Never forget how special you are to me ❤️
+</p>
+
+<img id="photo" src="IMG_0755.jpeg">
+
+<br>
+<button onclick="toggleMusic()">🎵 Play / Pause Music</button>
 </div>
 
 <audio id="music" loop>
@@ -91,14 +138,19 @@ clearInterval(timer);
 setTimeout(() => {
 countdownEl.style.display = "none";
 main.style.display = "block";
-music.play();
 startSlideshow();
+createHearts();
 }, 800);
 }
 }, 1000);
 
 /* Slideshow */
-let photos = ["foto1.jpg", "foto2.jpg", "foto3.jpg"];
+let photos = [
+"IMG_0755.jpeg",
+"IMG_1200.jpeg",
+"IMG_3878.jpeg"
+];
+
 let i = 0;
 
 function startSlideshow() {
@@ -106,6 +158,32 @@ setInterval(() => {
 i = (i + 1) % photos.length;
 document.getElementById("photo").src = photos[i];
 }, 2500);
+}
+
+/* Music toggle */
+function toggleMusic() {
+if (music.paused) {
+music.play();
+} else {
+music.pause();
+}
+}
+
+/* Floating hearts */
+function createHearts() {
+setInterval(() => {
+let heart = document.createElement("div");
+heart.classList.add("heart");
+heart.innerHTML = "💖";
+heart.style.left = Math.random() * 100 + "vw";
+heart.style.fontSize = (Math.random() * 20 + 10) + "px";
+
+document.body.appendChild(heart);
+
+setTimeout(() => {
+heart.remove();
+}, 5000);
+}, 300);
 }
 </script>
 

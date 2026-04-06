@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>✨ Happy Birthday ✨</title>
+  <title>✨ Happy Birthday - The Living Book ✨</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      user-select: none; /* smoother interactions */
+      user-select: none;
     }
 
     body {
@@ -50,7 +50,6 @@
       100% { transform: translateY(0px) rotateX(2deg); }
     }
 
-    /* title area */
     h1 {
       font-size: 48px;
       font-weight: 800;
@@ -70,7 +69,6 @@
       100% { text-shadow: 0 0 15px #ff6a88; }
     }
 
-    /* animated message that moves like a living letter */
     .moving-message {
       background: rgba(0, 0, 0, 0.35);
       backdrop-filter: blur(8px);
@@ -97,7 +95,6 @@
       transition: transform 0.2s;
     }
 
-    /* gallery zone: floating photo frames that change position */
     .gallery-stage {
       position: relative;
       min-height: 340px;
@@ -135,14 +132,6 @@
       transition: all 0.3s;
     }
 
-    /* different random positions will be applied dynamically by JS */
-    .photo-pos-0 { top: 0px; left: 5%; transform: rotate(-3deg); z-index: 12; }
-    .photo-pos-1 { top: 20px; right: 2%; transform: rotate(4deg); z-index: 10; width: 76%; max-width: 250px; }
-    .photo-pos-2 { bottom: -10px; left: 12%; transform: rotate(2deg); z-index: 11; }
-    .photo-pos-3 { top: 40px; left: 20%; transform: rotate(-5deg); z-index: 9; width: 70%; }
-    .photo-pos-4 { bottom: 15px; right: 8%; transform: rotate(6deg); }
-    
-    /* control bar */
     .controls {
       display: flex;
       justify-content: center;
@@ -172,7 +161,6 @@
       color: #8f1f3c;
     }
 
-    /* floating hearts + particles */
     .floating-heart {
       position: fixed;
       pointer-events: none;
@@ -192,7 +180,6 @@
       }
     }
 
-    /* countdown style (epic) */
     #countdown-overlay {
       position: fixed;
       top: 0;
@@ -201,6 +188,7 @@
       height: 100%;
       background: radial-gradient(circle, #2a1333, #0b0618);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 2000;
@@ -223,11 +211,27 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
+    .autoplay-hint {
+      margin-top: 30px;
+      color: #ffcfb0;
+      background: rgba(0,0,0,0.5);
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-size: 16px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      animation: pulseHint 1.5s infinite;
+    }
+
+    @keyframes pulseHint {
+      0% { opacity: 0.6; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1.02); }
+    }
+
     .hidden {
       display: none !important;
     }
 
-    /* small hint */
     .hint-text {
       text-align: center;
       font-size: 12px;
@@ -240,6 +244,7 @@
       h1 { font-size: 36px; }
       .moving-message p { font-size: 17px; }
       .floating-photo { width: 75%; max-width: 220px; }
+      .autoplay-hint { font-size: 12px; }
     }
   </style>
 </head>
@@ -247,6 +252,10 @@
 
 <div id="countdown-overlay">
   <div class="countdown-number" id="countdown-digit">3</div>
+  <div class="autoplay-hint" id="autoplayHint">
+    🎵 Kliko kudo për të filluar muzikën 🎵<br>
+    <span style="font-size:12px">(shfletuesit kërkojnë një klikim)</span>
+  </div>
 </div>
 
 <div class="book-container" id="bookContainer" style="display: none;">
@@ -262,7 +271,6 @@
       </p>
     </div>
 
-    <!-- DYNAMIC PHOTO GALLERY: photos will move randomly between positions -->
     <div class="gallery-stage" id="galleryStage">
       <div class="floating-photo" id="floatingPhoto">
         <img id="dynamicPhoto" src="IMG_0755.jpeg" alt="birthday moment">
@@ -270,28 +278,29 @@
     </div>
 
     <div class="controls">
-      <button id="musicToggleBtn">🎵 Play Song 🎵</button>
-      <button id="shufflePhotosBtn">Move</button>
+      <button id="musicToggleBtn">🎵 Play Heart Song 🎵</button>
+      <button id="shufflePhotosBtn">🖼️ Shuffle & Move</button>
     </div>
-    <div class="hint-text">💡✨</div>
+    <div class="hint-text">💡 Tap on photo → sparkles | Message moves like magic | Photos dance ✨</div>
   </div>
 </div>
 
 <audio id="birthdayAudio" loop preload="auto">
+  <source src="baba.mp4" type="audio/mpeg">
   <source src="baba.mp3" type="audio/mpeg">
+  Your browser does not support audio.
 </audio>
 
 <script>
   (function() {
-    // ---------- EXTENDED PHOTO LIST (shumë foto) ----------
+    // ---------- EXTENDED PHOTO LIST ----------
     const MASTER_PHOTOS = [
       "IMG_0755.jpeg", "IMG_1200.jpeg", "IMG_3878.jpeg",
       "IMG_4002.jpeg", "IMG_5203.jpeg", "IMG_6301.jpeg",
       "IMG_7555.jpeg", "IMG_8899.jpeg", "IMG_heart1.jpeg",
       "IMG_birthday_moment.jpeg", "IMG_love2.jpeg"
-    ];  // shtova 11 foto (nr me i madh). Mund të zëvendësohen me emrat tuaj real.
+    ];
 
-    // Pozicione te ndryshme per foto qe te lëvizin (si në libër të gjallë)
     const POSITIONS = [
       { top: "0px", left: "2%", rotate: "-4deg", width: "82%", maxWidth: "270px", bottom: "auto", right: "auto" },
       { top: "25px", right: "0%", rotate: "5deg", width: "76%", maxWidth: "260px", left: "auto", bottom: "auto" },
@@ -307,24 +316,54 @@
     let slideInterval = null;
     let musicPlaying = false;
     let positionInterval = null;
+    let musicAttempted = false;
 
     const audio = document.getElementById("birthdayAudio");
     const musicBtn = document.getElementById("musicToggleBtn");
     const shuffleBtn = document.getElementById("shufflePhotosBtn");
     const photoContainer = document.getElementById("floatingPhoto");
     const photoImg = document.getElementById("dynamicPhoto");
-    const galleryStage = document.getElementById("galleryStage");
-    const messageDiv = document.getElementById("movingMessage");
-    const messageText = document.getElementById("messageText");
     const bookContainer = document.getElementById("bookContainer");
     const countdownOverlay = document.getElementById("countdown-overlay");
     const countdownDigitSpan = document.getElementById("countdown-digit");
+    const autoplayHint = document.getElementById("autoplayHint");
 
-    // Helper: random position for the floating photo (lëviz vazhdimisht)
+    // FUNKSIONI PËR TË LUAR MUZIKËN AUTOMATIKISHT (pas klikimit)
+    function attemptAutoPlay() {
+      if (musicAttempted) return;
+      musicAttempted = true;
+      
+      audio.play().then(() => {
+        musicPlaying = true;
+        musicBtn.innerHTML = "🔊 Pause Melody 🔊";
+        musicBtn.style.background = "#ffe0d0";
+        if (autoplayHint) autoplayHint.style.opacity = "0";
+        setTimeout(() => {
+          if (autoplayHint) autoplayHint.style.display = "none";
+        }, 500);
+      }).catch((err) => {
+        console.log("Auto-play needs user interaction:", err);
+        // Nëse nuk funksionon, tregojmë butonin që të klikojë përdoruesi
+        if (autoplayHint) {
+          autoplayHint.innerHTML = "🎵 Kliko butonin për të filluar muzikën 🎵<br><span style='font-size:11px'>browser-i kërkon leje</span>";
+        }
+      });
+    }
+
+    // Kapim klikimin e parë kudo në faqe për të nisur muzikën
+    function bindGlobalAutoplay() {
+      const startMusicOnFirstClick = () => {
+        attemptAutoPlay();
+        document.removeEventListener("click", startMusicOnFirstClick);
+        document.removeEventListener("touchstart", startMusicOnFirstClick);
+      };
+      document.addEventListener("click", startMusicOnFirstClick);
+      document.addEventListener("touchstart", startMusicOnFirstClick);
+    }
+
     function applyRandomPosition() {
       if (!photoContainer) return;
       const randPos = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-      // reset all inline styles
       photoContainer.style.top = '';
       photoContainer.style.bottom = '';
       photoContainer.style.left = '';
@@ -343,63 +382,42 @@
       photoContainer.style.transition = "all 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.2)";
     }
 
-    // Ndrysho foton dhe njëherësh lëviz pozicionin (foto lëviz në vende të ndryshme)
     function nextPhotoWithMovement() {
       if (!MASTER_PHOTOS.length) return;
       currentPhotoIndex = (currentPhotoIndex + 1) % MASTER_PHOTOS.length;
       const newSrc = MASTER_PHOTOS[currentPhotoIndex];
-      // smooth crossfade
       photoImg.style.opacity = "0.5";
       setTimeout(() => {
         photoImg.src = newSrc;
         photoImg.style.opacity = "1";
       }, 100);
-      // lëviz pozicionin e kornizës
       applyRandomPosition();
-      // ndrysho edhe animacionin e mesazhit që të duket dinamik
       animateMessageShake();
     }
 
-    // Animacion i tekstit: leviz lehtë mesazhi si valë
     function animateMessageShake() {
-      messageDiv.style.transform = "translateX(6px) translateY(-3px)";
-      setTimeout(() => {
-        messageDiv.style.transform = "translateX(0px) translateY(0px)";
-      }, 300);
-      // ndryshim i vogël i tekstit (opsionale: ndrysho fjalë përshëndetëse)
-      const messages = [
-        "✨ You are the sunshine that breaks every cloud. Shine forever! ✨",
-        "💖 Every heartbeat of yours creates magic. Happiest Birthday! 💖",
-        "🎈 May your day be as beautiful as your soul. Love you tons! 🎈",
-        "🌟 You are the masterpiece of the universe — celebrate yourself! 🌟",
-        "💕 With you, life is a never-ending celebration. Happy Birthday! 💕"
-      ];
-      // ndrysho tekstin por mbaje strukturën e bukur
-      if (Math.random() > 0.6) {
-        const altMsg = messages[Math.floor(Math.random() * messages.length)];
-        messageText.innerHTML = `💫 ${altMsg}<br><br>You are my safe place, my laughter, my everything. Today the world celebrates you 🎂💝`;
+      const messageDiv = document.getElementById("movingMessage");
+      if (messageDiv) {
+        messageDiv.style.transform = "translateX(6px) translateY(-3px)";
+        setTimeout(() => {
+          messageDiv.style.transform = "translateX(0px) translateY(0px)";
+        }, 300);
       }
     }
 
-    // Funksion që ndryshon pozicionin e fotos çdo 3 sekonda (dhe gjithashtu foto ndryshon)
     function startDynamicMovement() {
       if (slideInterval) clearInterval(slideInterval);
       if (positionInterval) clearInterval(positionInterval);
       
-      // ndryshimi i fotos + levizje e pozicionit çdo 2.8 sekonda
       slideInterval = setInterval(() => {
         nextPhotoWithMovement();
       }, 2800);
       
-      // gjithashtu çdo 2 sekonda ndrysho pak pozicionin pa ndryshuar foto? por mjafton.
       positionInterval = setInterval(() => {
-        if (photoContainer) {
-          applyRandomPosition();
-        }
+        if (photoContainer) applyRandomPosition();
       }, 5000);
     }
 
-    // Krijimi i zemrave lundruese (efekt i pasur)
     function createFloatingHearts() {
       setInterval(() => {
         const heartCount = Math.floor(Math.random() * 4) + 2;
@@ -418,7 +436,6 @@
       }, 380);
     }
 
-    // Krijo spërkatje (sparkles) në foto kur klikohet
     function createSparklesOnPhoto(x, y) {
       for (let i = 0; i < 12; i++) {
         const spark = document.createElement("div");
@@ -436,12 +453,11 @@
         setTimeout(() => spark.remove(), 800);
       }
     }
-    // stil për sparkle
+
     const styleSpark = document.createElement('style');
     styleSpark.textContent = `@keyframes sparkFade { 0% { opacity: 1; transform: scale(0.2); } 100% { opacity: 0; transform: scale(1.5); } }`;
     document.head.appendChild(styleSpark);
 
-    // event klikimi i fotos
     function bindPhotoClick() {
       photoImg.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -449,26 +465,24 @@
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         createSparklesOnPhoto(centerX, centerY);
-        // efekt animacioni
         photoContainer.style.transform = `scale(0.96) rotate(${Math.random() * 4 - 2}deg)`;
         setTimeout(() => {
           if (photoContainer) photoContainer.style.transform = "";
           applyRandomPosition();
         }, 180);
-        // ndrysho edhe foton rastësisht? opsionale
       });
     }
 
-    // Muzikë toggle me emoji
     function initMusic() {
-      musicBtn.addEventListener("click", () => {
+      musicBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
         if (audio.paused) {
           audio.play().then(() => {
             musicPlaying = true;
             musicBtn.innerHTML = "🔊 Pause Melody 🔊";
             musicBtn.style.background = "#ffe0d0";
           }).catch(() => {
-            alert("🎶 Please allow audio: tap again to play music! 💖");
+            alert("🎶 Ju lutem klikoni përsëri për të lejuar muzikën! 💖");
           });
         } else {
           audio.pause();
@@ -480,19 +494,17 @@
       audio.load();
     }
 
-    // Butoni Shuffle: ndrysho foton menjëherë dhe lëviz pozicionin
     function shufflePhotoManually() {
       currentPhotoIndex = (currentPhotoIndex + 1) % MASTER_PHOTOS.length;
       photoImg.src = MASTER_PHOTOS[currentPhotoIndex];
       applyRandomPosition();
       animateMessageShake();
-      // efekt vizual ekstra
       const container = document.querySelector('.birthday-book');
       container.style.transform = "scale(1.01) rotateX(2deg)";
       setTimeout(() => { container.style.transform = ""; }, 300);
     }
 
-    // Countdown me efekt (3,2,1, GO)
+    // COUNTDOWN
     let count = 3;
     const countdownInterval = setInterval(() => {
       if (count > 0) {
@@ -506,66 +518,53 @@
           setTimeout(() => {
             countdownOverlay.classList.add("hidden");
             bookContainer.style.display = "block";
-            // nis të gjitha funksionalitetet
             startDynamicMovement();
             createFloatingHearts();
             bindPhotoClick();
-            applyRandomPosition(); // pozicionim fillestar
-            // animacion fillestar i librit
+            applyRandomPosition();
+            
+            // Pasi shfaqet libri, lidhim autoplay global
+            bindGlobalAutoplay();
+            
             bookContainer.style.animation = "fadeRiseBook 0.8s ease";
           }, 500);
         }, 600);
       }
     }, 1000);
-    
-    // Animacion hyrje libri
+
     const styleAnim = document.createElement('style');
     styleAnim.textContent = `
       @keyframes fadeRiseBook {
         0% { opacity: 0; transform: translateY(40px) rotateX(-10deg); }
         100% { opacity: 1; transform: translateY(0) rotateX(0deg); }
       }
-      .birthday-book {
-        transition: transform 0.2s;
-      }
     `;
     document.head.appendChild(styleAnim);
-    
-    // gjenerimi i tekstit të lëvizshëm: lëvizje e vazhdueshme e butë e mesazhit (shtesë)
+
     setInterval(() => {
       if (bookContainer.style.display === "block") {
-        messageDiv.style.transform = `translateX(${Math.sin(Date.now() / 1800) * 6}px) translateY(${Math.cos(Date.now() / 2200) * 3}px)`;
+        const messageDiv = document.getElementById("movingMessage");
+        if (messageDiv) {
+          messageDiv.style.transform = `translateX(${Math.sin(Date.now() / 1800) * 6}px) translateY(${Math.cos(Date.now() / 2200) * 3}px)`;
+        }
       }
     }, 300);
-    
-    // Ndrysho pozicionin e fotos edhe në resize të dritares (për përshtatje)
+
     window.addEventListener("resize", () => {
       if (bookContainer.style.display === "block") applyRandomPosition();
     });
-    
-    // Sigurohu që fotot të jenë të gjitha të ngarkuara pa error, dhe në rast gabimi kalojme tek tjetra
+
     photoImg.addEventListener("error", () => {
       currentPhotoIndex = (currentPhotoIndex + 1) % MASTER_PHOTOS.length;
       photoImg.src = MASTER_PHOTOS[currentPhotoIndex];
     });
-    
-    // Butoni shuffle lidhje
+
     shuffleBtn.addEventListener("click", shufflePhotoManually);
-    
-    // Aktivizo menaxhimin e muzikes
     initMusic();
-    
-    // Preload disa foto
+
     MASTER_PHOTOS.forEach(src => { const img = new Image(); img.src = src; });
-    
-    // Shtesa: ndryshimi i sfondit dinamik
-    setInterval(() => {
-      if (bookContainer.style.display === "block") {
-        document.body.style.background = `radial-gradient(circle at ${Math.random() * 70 + 10}% ${Math.random() * 60 + 20}%, #231b3b, #100b1f)`;
-      }
-    }, 9000);
-    
-    console.log("🎂 Happy Birthday! Foto lëvizin, teksti valëzon, shumë funksione aktive!");
+
+    console.log("🎂 Happy Birthday! Muzika do të fillojë pas klikimit të parë!");
   })();
 </script>
 </body>

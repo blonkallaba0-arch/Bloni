@@ -1,0 +1,36 @@
+2026-03-07 01:14:42 - Order data: Array
+(
+    [name] => h
+    [email] => admin@rovix.com
+    [phone] => u
+    [address] => u
+    [city] => u
+    [payment] => bkt
+    [notes] => u
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 19
+                    [name] => Kamere Canon RST7y
+                    [price] => 575.00
+                    [image] => 69ab6299a0d4d.jpeg
+                    [quantity] => 1
+                )
+
+        )
+
+    [total] => 575
+)
+
+Processed data: user_name=h, email=admin@rovix.com, phone=u
+Total amount: 575
+Order SQL: INSERT INTO orders (
+            order_number, user_id, user_name, user_email, user_phone,
+            total_amount, status, payment_method, payment_status,
+            shipping_address, billing_address, notes, created_at, updated_at
+        ) VALUES (
+            'ORD-20260307-2241', 0, 'h', 'admin@rovix.com', 'u',
+            575, 'pending', 'bkt', 'pending',
+            'u', 'u', 'u', NOW(), NOW()
+        )

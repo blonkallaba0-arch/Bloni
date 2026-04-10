@@ -1,127 +1,3513 @@
+<?php
+session_start();
+require_once 'config/init.php';
+?>
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-  <meta charset="UTF-8">
-  <title>Pinguin Shop</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinguinShop - Dyqani Online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: sans-serif;
-    }
+        body {
+            background: linear-gradient(135deg, #2d1b4e, #3d1e5e);
+            color: white;
+        }
 
-    body {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(to bottom, #c94c4c, #6b1d1d);
-    }
+        /* Header */
+        .main-header {
+            background: rgba(58, 48, 91, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(108, 52, 131, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-bottom: 1px solid rgba(173, 50, 136, 0.3);
+        }
 
-    .container {
-      text-align: center;
-      color: white;
-      width: 300px;
-    }
+        .main-header.hidden {
+            transform: translateY(-100%);
+        }
 
-    h1 {
-      margin-bottom: 20px;
-    }
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+        }
 
-    .logo {
-      margin-bottom: 20px;
-      font-size: 40px;
-    }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
 
-    .logo p {
-      margin-top: 5px;
-      font-weight: bold;
-      font-size: 14px;
-    }
+        .logo-img {
+            width: 120px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+        }
 
-    input {
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.5);
-      outline: none;
-    }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
 
-    button {
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: #aeb4c0;
-      cursor: pointer;
-      font-weight: bold;
-    }
+        .logo-main {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0b0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(173, 50, 136, 0.3);
+        }
 
-    button:hover {
-      background: #949aa5;
-    }
+        .logo-main span {
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .links {
-      margin-top: 15px;
-      font-size: 12px;
-    }
+        .logo-tagline {
+            font-size: 12px;
+            color: #d4b5ff;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
 
-    .links a {
-      color: #00c3ff;
-      text-decoration: none;
-    }
-  </style>
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar form {
+            display: flex;
+            border: 2px solid rgba(173, 50, 136, 0.3);
+            border-radius: 50px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+        }
+
+        .search-bar form:focus-within {
+            border-color: #ad3288;
+            box-shadow: 0 0 0 4px rgba(173, 50, 136, 0.2);
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-bar button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ad3288, #6b2d7a);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .search-bar button:hover {
+            background: linear-gradient(135deg, #c23d9a, #7d358c);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e1d5ff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(108, 52, 131, 0.15);
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .search-result-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0e8ff;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f0ff;
+        }
+
+        .search-result-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d1b4e;
+            margin-bottom: 5px;
+        }
+
+        .search-result-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .search-result-price {
+            color: #ad3288;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .search-result-category {
+            display: inline-block;
+            background-color: #f0e4ff;
+            color: #6b2d7a;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 25px;
+        }
+
+        .action-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .action-link:hover {
+            color: #ffd966;
+            transform: translateY(-3px);
+        }
+
+        .action-link i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+        }
+
+        .action-link span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            min-width: 220px;
+            z-index: 1000;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #2d1b4e;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f8f0ff;
+            padding-left: 25px;
+        }
+
+        .dropdown-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            color: #ad3288;
+        }
+
+        .dropdown-menu a.logout i {
+            color: #ff4757;
+        }
+
+        /* Top Message */
+        .top-message {
+            background: linear-gradient(90deg, #6b2d7a, #ad3288, #e1d43f);
+            color: white;
+            padding: 12px 0;
+            overflow: hidden;
+            position: relative;
+            z-index: 1001;
+            border-bottom: 2px solid rgb(85, 71, 116);
+        }
+
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+
+        .marquee-content span {
+            display: inline-block;
+            padding-right: 50px;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .marquee-content i {
+            margin: 0 15px;
+            color: #ffd966;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .top-message:hover .marquee-content {
+            animation-play-state: paused;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 30px;
+            position: relative;
+        }
+
+        /* Slider Container */
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(108, 52, 131, 0.3);
+            height: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Slider Wrapper */
+        .slider-wrapper {
+            display: flex;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        /* Slide */
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Slide Background - Foto */
+        .slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 8s linear;
+        }
+
+        .slide:hover .slide-image {
+            transform: scale(1.1);
+        }
+
+        /* Slide Overlay */
+        .slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(108, 52, 131, 0.4), rgba(173, 50, 136, 0.4));
+            z-index: 1;
+            transition: background 0.3s ease;
+        }
+
+        .slide:hover .slide-overlay {
+            background: linear-gradient(135deg, rgba(108, 52, 131, 0.3), rgba(173, 50, 136, 0.3));
+        }
+
+        /* Slide Content */
+        .slide-content {
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+            color: white;
+            animation: contentFadeIn 1s ease;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes contentFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Slide Title */
+        .slide-title {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #ffffff, #ffd966);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: titleGlow 2s infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 217, 102, 0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255, 217, 102, 0.8)); }
+        }
+
+        /* Slider Navigation Arrows */
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slider-arrow:hover {
+            background: rgba(173, 50, 136, 0.5);
+            border-color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slider-arrow.prev {
+            left: 20px;
+        }
+
+        .slider-arrow.next {
+            right: 20px;
+        }
+
+        /* Slider Dots */
+        .slider-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider-dot:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.2);
+        }
+
+        .slider-dot.active {
+            background: #ffd966;
+            border-color: #ffd966;
+            transform: scale(1.3);
+            box-shadow: 0 0 15px #ffd966;
+        }
+
+        /* Slider Counter */
+        .slider-counter {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(108, 52, 131, 0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10;
+            border: 1px solid rgba(255, 217, 102, 0.3);
+        }
+
+        /* Categories */
+        .categories-nav {
+            background: rgba(61, 55, 81, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(173, 50, 136, 0.3);
+            border-bottom: 1px solid rgba(173, 50, 136, 0.3);
+            margin: 20px 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .categories-list {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            list-style: none;
+            gap: 5px;
+        }
+
+        .categories-list li a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 30px;
+        }
+
+        .categories-list li a:hover {
+            color: #2d1b4e;
+            background: #ffd966;
+            box-shadow: 0 4px 15px rgba(255, 217, 102, 0.3);
+        }
+
+        /* Products Section */
+        .products-section {
+            max-width: 1400px;
+            margin: 50px auto;
+            padding: 0 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 26px;
+            color: #ebe9ee;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2 i {
+            color: #ad3288;
+            margin-right: 10px;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #ad3288, #ffd966);
+            border-radius: 2px;
+        }
+
+        .view-all {
+            color: #e4dcf5;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 20px;
+            border: 2px solid #ad3288;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .view-all i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .view-all:hover {
+            background: linear-gradient(135deg, #ad3288, #6b2d7a);
+            color: white;
+            border-color: transparent;
+        }
+
+        .view-all:hover i {
+            transform: translateX(5px);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+       .product-card {
+    background: rgba(45, 27, 78, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(255, 217, 102, 0.2);
+    border-color: #ffd966;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: linear-gradient(135deg, #ff6b6b, #ff4757);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 2;
+    box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+}
+
+.wishlist-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    color: #ffd966;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.wishlist-badge i {
+    font-size: 18px;
+}
+
+.wishlist-badge.active {
+    background: #ffd966;
+    color: #2d1b4e;
+}
+
+.wishlist-badge:hover {
+    transform: scale(1.1);
+}
+
+.product-image {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #2d1b4e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.08);
+}
+
+.product-info {
+    padding: 15px;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.product-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: white;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+    height: 36px;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.product-price {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.current-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffd966;
+}
+
+.old-price {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: line-through;
+}
+
+.product-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-add-cart {
+    flex: 1;
+    padding: 8px;
+    background: linear-gradient(135deg, #ad3288, #6b2d7a);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 13px;
+}
+
+.btn-add-cart:hover {
+    background: linear-gradient(135deg, #c23d9a, #7d358c);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(173, 50, 136, 0.3);
+}
+
+.btn-buy-now {
+    flex: 1;
+    padding: 8px;
+    background: linear-gradient(135deg, #ffd966, #ffb347);
+    color: #2d1b4e;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 13px;
+}
+
+.btn-buy-now:hover {
+    background: linear-gradient(135deg, #ffb347, #ff9f1c);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 217, 102, 0.3);
+}
+
+       /* Modal Styles */
+.product-detail-modal,
+.modal,
+.wishlist-modal,
+.order-modal,
+.cart-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(45, 27, 78, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-detail-content,
+.modal-content,
+.wishlist-content,
+.order-content,
+.cart-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 1000px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    border: 1px solid rgba(173, 50, 136, 0.3);
+    box-shadow: 0 20px 50px rgba(108, 52, 131, 0.3);
+    color: #333333; /* NDRYSHIM: Ngjyrë e errët për tekstin kryesor */
+}
+
+.modal-close,
+.product-detail-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ad3288;
+    z-index: 10;
+    transition: all 0.3s;
+}
+
+.modal-close:hover,
+.product-detail-close:hover {
+    transform: rotate(90deg);
+    color: #ff4757;
+}
+
+.modal-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ad3288;
+    padding-bottom: 10px;
+}
+
+.modal-header h3 {
+    color: #2d1b4e; /* NDRYSHIM: Ngjyrë e errët për titujt */
+    font-size: 24px;
+}
+
+.modal-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.product-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.product-detail-image {
+    background-color: #f8f0ff;
+    padding: 30px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    border: 1px solid rgba(173, 50, 136, 0.2);
+}
+
+.product-detail-image img {
+    max-width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+}
+
+.product-detail-info h2 {
+    color: #2d1b4e; /* NDRYSHIM: Ngjyrë e errët për titullin e produktit */
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.product-detail-category {
+    color: #6b2d7a; /* NDRYSHIM: Ngjyrë vjollcë për kategorinë */
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.product-detail-price {
+    margin-bottom: 20px;
+}
+
+.product-detail-current {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ad3288;
+}
+
+.product-detail-old {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.product-detail-info p {
+    color: #444444; /* NDRYSHIM: Ngjyrë gri e errët për përshkrimin */
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.product-detail-info strong {
+    color: #2d1b4e; /* NDRYSHIM: Ngjyrë e errët për tekstin e theksuar */
+}
+
+.product-detail-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-wishlist {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #ffd966, #ffb347);
+    color: #2d1b4e;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.btn-wishlist.active {
+    background: linear-gradient(135deg, #ff4757, #ff6b6b);
+    color: white;
+}
+
+.btn-wishlist:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 217, 102, 0.3);
+}
+
+.btn-wishlist.active:hover {
+    box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+}
+
+/* Order Form Styles */
+.order-summary {
+    background-color: #f8f0ff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(173, 50, 136, 0.2);
+}
+
+.order-summary h4 {
+    margin-bottom: 10px;
+    color: #2d1b4e;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    color: #2d1b4e;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px solid #ad3288;
+    font-weight: bold;
+    font-size: 18px;
+    color: #ad3288;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #2d1b4e;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(173, 50, 136, 0.3);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s;
+    color: #333333; /* NDRYSHIM: Ngjyrë e errët për tekstin në input */
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #ad3288;
+    box-shadow: 0 0 0 3px rgba(173, 50, 136, 0.1);
+}
+
+.form-group textarea {
+    height: 80px;
+    resize: vertical;
+}
+
+/* Cart Styles */
+.cart-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ad3288;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-header h3 {
+    color: #2d1b4e;
+    font-size: 24px;
+}
+
+.cart-items {
+    margin-bottom: 20px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0e4ff;
+}
+
+.cart-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-right: 15px;
+    background: #f8f0ff;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-title {
+    font-weight: 600;
+    color: #2d1b4e;
+    margin-bottom: 5px;
+}
+
+.cart-item-price {
+    color: #ad3288;
+    font-weight: bold;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    background-color: #f0e4ff;
+    border: 1px solid rgba(173, 50, 136, 0.3);
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    color: #2d1b4e;
+}
+
+.quantity-btn:hover {
+    background-color: #ad3288;
+    color: white;
+}
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: #ff4757;
+    cursor: pointer;
+    margin-left: 15px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.cart-item-remove:hover {
+    transform: scale(1.2);
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 2px solid #ad3288;
+    font-weight: bold;
+    font-size: 18px;
+    color: #2d1b4e;
+}
+
+.cart-total-price {
+    color: #ad3288;
+}
+
+.cart-empty {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+}
+
+/* Wishlist Styles */
+.wishlist-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ad3288;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wishlist-header h3 {
+    color: #2d1b4e;
+    font-size: 24px;
+}
+
+.wishlist-header h3 i {
+    margin-right: 10px;
+}
+
+.wishlist-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.wishlist-empty {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    grid-column: 1 / -1;
+}
+
+        /* Notifications */
+        .cart-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+
+        .cart-notification.show {
+            transform: translateX(0);
+        }
+
+        .cart-notification.success {
+            background: linear-gradient(135deg, #27ae60, #219653);
+        }
+
+        .cart-notification:not(.success) {
+            background: linear-gradient(135deg, #ad3288, #6b2d7a);
+        }
+
+        /* Pinguin AI Assistant */
+        .pinguin-ai {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 2000;
+        }
+
+        .ai-button {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+            border: 4px solid white;
+            transition: all 0.3s ease;
+        }
+
+        .ai-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.5);
+        }
+
+        .ai-button img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+        }
+
+        .message-bubble {
+            position: absolute;
+            top: -20px;
+            right: 70px;
+            background: white;
+            color: #2d1b4e;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: bounce 2s ease infinite;
+        }
+
+        .message-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid white;
+        }
+
+        .pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.5);
+            animation: pulse 2s ease-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-5px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        /* AI Chat Window */
+        .ai-chat {
+            position: absolute;
+            bottom: 100px;
+            right: 0;
+            width: 380px;
+            height: 550px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            border: 2px solid #ffd966;
+        }
+
+        .ai-chat.show {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-header {
+            background: linear-gradient(135deg, #2d1b4e, #3d1e5e);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #ffd966;
+        }
+
+        .ai-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffd966;
+        }
+
+        .ai-header-info {
+            flex: 1;
+        }
+
+        .ai-header-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #ffd966;
+        }
+
+        .ai-header-info p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .ai-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .ai-header button:hover {
+            transform: rotate(90deg);
+            color: #ff4757;
+        }
+
+        .ai-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 5px;
+        }
+
+        .message.ai {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.ai .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #ad3288, #6b2d7a);
+            color: white;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 5px rgba(173, 50, 136, 0.2);
+        }
+
+        .ai-typing {
+            display: flex;
+            gap: 5px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .ai-typing span {
+            width: 8px;
+            height: 8px;
+            background: #ad3288;
+            border-radius: 50%;
+            animation: typing 1s infinite ease-in-out;
+        }
+
+        .ai-typing span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .ai-typing span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        .ai-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            gap: 10px;
+        }
+
+        .ai-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .ai-input input:focus {
+            border-color: #ad3288;
+            box-shadow: 0 0 0 3px rgba(173, 50, 136, 0.1);
+        }
+
+        .ai-input button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ad3288, #6b2d7a);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .ai-input button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(173, 50, 136, 0.3);
+        }
+
+        .quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .quick-question {
+            background: white;
+            border: 1px solid #ad3288;
+            color: #ad3288;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-question:hover {
+            background: #ad3288;
+            color: white;
+        }
+
+        /* Footer */
+        .main-footer {
+            background: linear-gradient(135deg, #2d1b4e, #3d1e5e);
+            color: white;
+            padding: 60px 0 0;
+            border-top: 1px solid rgba(173, 50, 136, 0.3);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            margin-bottom: 25px;
+            font-size: 18px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #ad3288, #ffd966);
+        }
+
+        .footer-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 3px solid #ad3288;
+        }
+
+        .footer-col p {
+            color: #d4b5ff;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            color: #d4b5ff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .footer-col ul li a:hover {
+            color: #ffd966;
+            transform: translateX(5px);
+        }
+
+        .footer-col ul li i {
+            margin-right: 10px;
+            color: #ad3288;
+            width: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(173, 50, 136, 0.2);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: #ad3288;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 25px 0;
+            margin-top: 40px;
+            border-top: 1px solid rgba(173, 50, 136, 0.3);
+            color: #d4b5ff;
+            font-size: 13px;
+        }
+
+        .footer-bottom a {
+            color: #ffd966;
+            text-decoration: none;
+        }
+
+        .footer-bottom a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .slide-title {
+                font-size: 48px;
+            }
+            .slider-container {
+                height: 450px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .slider-container {
+                height: 400px;
+            }
+            .slide-title {
+                font-size: 42px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slider-container {
+                height: 350px;
+            }
+            .slide-title {
+                font-size: 32px;
+            }
+            .slider-arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            .product-detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .ai-chat {
+                width: 320px;
+                height: 500px;
+                right: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .slider-container {
+                height: 250px;
+            }
+            .slide-title {
+                font-size: 24px;
+            }
+            .slider-arrow {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+            .ai-chat {
+                width: 300px;
+                right: 0;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <!-- Top Message -->
+    <div class="top-message">
+        <div class="marquee">
+            <div class="marquee-content">
+                <span><i class="fas fa-penguin"></i> Mirë se vini në Pinguin Shop - Blerje online të shpejta dhe të sigurta! <i class="fas fa-penguin"></i></span>
+                <span><i class="fas fa-penguin"></i> Mirë se vini në Pinguin Shop - Blerje online të shpejta dhe të sigurta! <i class="fas fa-penguin"></i></span>
+                <span><i class="fas fa-penguin"></i> Mirë se vini në Pinguin Shop - Blerje online të shpejta dhe të sigurta! <i class="fas fa-penguin"></i></span>
+                <span><i class="fas fa-penguin"></i> Mirë se vini në Pinguin Shop - Blerje online të shpejta dhe të sigurta! <i class="fas fa-penguin"></i></span>
+                <span><i class="fas fa-penguin"></i> Mirë se vini në Pinguin Shop - Blerje online të shpejta dhe të sigurta! <i class="fas fa-penguin"></i></span>
+                <span><i class="fas fa-penguin"></i> Mirë se vini në Pinguin Shop - Blerje online të shpejta dhe të sigurta! <i class="fas fa-penguin"></i></span>
+            </div>
+        </div>
+    </div>
 
-<div class="container">
-  <h1>Pinguin Shop</h1>
+    <!-- Header -->
+    <header class="main-header" id="mainHeader">
+        <div class="header-container">
+            <div class="logo-container" onclick="window.location.href='index.php'">
+                <!-- Logo e rrumbullakët -->
+                <img src="assets/images/pinguin.png" alt="PinguinShop Logo" class="logo-img" id="headerLogo">
+                <div class="logo-text">
+                    <div class="logo-main">Pinguin<span>Shop</span></div>
+                    <div class="logo-tagline">Blerje online të shpejta dhe të sigurta</div>
+                </div>
+            </div>
+            
+            <div class="search-bar">
+                <form onsubmit="event.preventDefault();">
+                    <input type="text" placeholder="Kërko produkte..." id="searchInput">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            
+            <div class="header-actions">
+                <?php if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true): ?>
+                    <!-- Përdoruesi i kyçur -->
+                    <div class="dropdown">
+                        <a href="#" class="action-link" id="userDropdown" onclick="toggleUserMenu(event)">
+                            <i class="fas fa-user-circle"></i>
+                            <span><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                        </a>
+                        <div class="dropdown-menu" id="userMenu">
+                            <a href="profile.php"><i class="fas fa-user"></i> Profili im</a>
+                            
+                            <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                            <a href="admin/orders.php"><i class="fas fa-cog"></i> Admin Panel</a>
+                            <?php endif; ?>
+                            <a href="logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Dil</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <!-- Përdoruesi i pa kyçur -->
+                    <a href="login.php" class="action-link">
+                        <i class="fas fa-user"></i>
+                        <span>Llogaria</span>
+                    </a>
+                <?php endif; ?>
+                
+                <a href="#" class="action-link" id="wishlistButton">
+                    <i class="fas fa-heart"></i>
+                    <span>Lista</span>
+                    <span class="badge" id="wishlistCount">0</span>
+                </a>
+                <a href="#" class="action-link" id="cartButton">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Shporta</span>
+                    <span class="badge" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
 
-  <div class="logo">
-    🐧
-    <p>Pinguin Shop</p>
-  </div>
+        <nav class="categories-nav">
+            <div class="nav-container">
+                <ul class="categories-list">
+                    <li><a href="#" data-category="elektronike">Elektronikë</a></li>
+                    <li><a href="#" data-category="veshje">Veshje & Modë</a></li>
+                    <li><a href="#" data-category="kozmetike">Kozmetikë & Shëndet</a></li>
+                    <li><a href="#" data-category="kepuce">Këpucë & Çanta</a></li>
+                    <li><a href="#" data-category="sport-aktivitete">Sport & Aktivitete</a></li>
+                    <li><a href="#" data-category="stoli-ore">Stoli & Orë</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
 
-  <form id="loginForm">
-    <input type="email" placeholder="Email" required>
-    <input type="password" placeholder="Password" required>
+    <!-- Hero Section - SLIDER ME FOTO -->
+    <section class="hero-section">
+        <div class="slider-container">
+            <div class="slider-wrapper" id="sliderWrapper">
+                <!-- Slide 1 - Reklama me Foto 1 -->
+                <div class="slide">
+                    <div class="slide-bg">
+                        <img src="assets/images/banner13.png" alt="Reklama 1" class="slide-image">
+                    </div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">Zbritje Deri -70%</h2>
+                    </div>
+                </div>
+                
+                <!-- Slide 2 - Reklama me Foto 2 -->
+                <div class="slide">
+                    <div class="slide-bg">
+                        <img src="assets/images/gilani1.png" alt="Reklama 2" class="slide-image">
+                    </div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">Lifestyle Premium</h2>
+                    </div>
+                </div>
+                
+                <!-- Slide 3 - Reklama me Foto 3 -->
+                <div class="slide">
+                    <div class="slide-bg">
+                        <img src="assets/images/banner44.png" alt="Reklama 3" class="slide-image">
+                    </div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">Atlete Sportive</h2>
+                    </div>
+                </div>
+                
+                <!-- Slide 4 - Reklama me Foto 4 -->
+                <div class="slide">
+                    <div class="slide-bg">
+                        <img src="assets/images/baner14.png" alt="Reklama 4" class="slide-image">
+                    </div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">Pajisje Teknologjike</h2>
+                    </div>
+                </div>
+                
+                <!-- Slide 5 - Reklama me Foto 5 -->
+                <div class="slide">
+                    <div class="slide-bg">
+                        <img src="assets/images/baner15.png" alt="Reklama 5" class="slide-image">
+                    </div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">Ora Cilësore</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slider Navigation - Shigjetat -->
+            <button class="slider-arrow prev" onclick="prevSlide()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-arrow next" onclick="nextSlide()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <!-- Slider Navigation - Pikat -->
+            <div class="slider-nav" id="sliderNav"></div>
 
-    <button type="submit">Kyqu ne Dyqan</button>
-  </form>
+            <!-- Counter -->
+            <div class="slider-counter" id="sliderCounter">1 / 5</div>
+        </div>
+    </section>
 
-  <div class="links">
-    <p>Keni harruar fjalëkalimin?</p>
-    <p>Nuk keni llogari? <a href="#">Regjistrohu</a></p>
-  </div>
-</div>
+    <!-- Products in Discount -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2><i class="fas fa-fire"></i> Në zbritje gjatë muajit Mars 2026</h2>
+            <a href="#" class="view-all" id="showMoreDiscount">Shiko të gjitha <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <div class="products-grid" id="discountProducts">
+            <!-- Produktet në zbritje do të shfaqen këtu -->
+        </div>
+    </section>
 
-<script>
-  document.getElementById("loginForm").addEventListener("submit", function(e) {
-    e.preventDefault();
+    <!-- Most Viewed Products -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2><i class="fas fa-star"></i> Më të kërkuarat</h2>
+            <a href="#" class="view-all" id="showMorePopular">Shiko të gjitha <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <div class="products-grid" id="popularProducts">
+            <!-- Produktet e kërkuara do të shfaqen këtu -->
+        </div>
+    </section>
 
-    const email = document.querySelector("input[type='email']").value;
-    const password = document.querySelector("input[type='password']").value;
+    <!-- Cheapest Products -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2><i class="fas fa-tags"></i> Më të lirat</h2>
+            <a href="#" class="view-all" onclick="showCheapestProducts(); return false;">Shiko të gjitha <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <div class="products-grid" id="cheapestProducts">
+            <!-- Produktet më të lira do të shfaqen këtu -->
+        </div>
+    </section>
 
-    if(email === "" || password === "") {
-      alert("Ploteso te gjitha fushat");
-      return;
-    }
+    <!-- New Products -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2><i class="fas fa-clock"></i> Produktet e reja</h2>
+            <a href="#" class="view-all" onclick="showNewProducts(); return false;">Shiko të gjitha <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <div class="products-grid" id="newProducts">
+            <!-- Produktet e reja do të shfaqen këtu -->
+        </div>
+    </section>
 
-    if(email === "admin@gmail.com" && password === "1234") {
-      alert("Kyqja u krye me sukses!");
-    } else {
-      alert("Email ose password gabim!");
-    }
-  });
-</script>
+    <!-- Product Detail Modal -->
+    <div class="product-detail-modal" id="productDetailModal">
+        <div class="product-detail-content">
+            <button class="product-detail-close" id="closeProductDetailModal">&times;</button>
+            <div id="productDetailContent"></div>
+        </div>
+    </div>
 
+    <!-- Discount Modal -->
+    <div class="modal" id="discountModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeDiscountModal">&times;</button>
+            <div class="modal-header">
+                <h3>Të gjitha produktet në zbritje</h3>
+            </div>
+            <div class="modal-products-grid" id="discountModalProducts">
+                <!-- Të gjitha produktet në zbritje do të shfaqen këtu -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Modal -->
+    <div class="modal" id="popularModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closePopularModal">&times;</button>
+            <div class="modal-header">
+                <h3>Të gjitha produktet më të kërkuara</h3>
+            </div>
+            <div class="modal-products-grid" id="popularModalProducts">
+                <!-- Të gjitha produktet e kërkuara do të shfaqen këtu -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCategoryModal">&times;</button>
+            <div class="modal-header">
+                <h3 id="categoryModalTitle">Produktet nga kategoria</h3>
+            </div>
+            <div class="modal-products-grid" id="categoryModalProducts">
+                <!-- Produktet nga kategoria do të shfaqen këtu -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cheapest Products Modal -->
+    <div class="modal" id="cheapestModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCheapestModal">&times;</button>
+            <div class="modal-header">
+                <h3>Produktet më të lira</h3>
+            </div>
+            <div class="modal-products-grid" id="cheapestModalProducts">
+                <!-- Produktet më të lira do të shfaqen këtu -->
+            </div>
+        </div>
+    </div>
+
+    <!-- New Products Modal -->
+    <div class="modal" id="newModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeNewModal">&times;</button>
+            <div class="modal-header">
+                <h3>Produktet e reja</h3>
+            </div>
+            <div class="modal-products-grid" id="newModalProducts">
+                <!-- Produktet e reja do të shfaqen këtu -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Modal (Rreth Nesh, etj.) -->
+    <div class="modal" id="pageModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <button class="modal-close" id="closePageModal">&times;</button>
+            <div class="modal-header">
+                <h3 id="pageModalTitle"></h3>
+            </div>
+            <div class="page-content" id="pageModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div class="order-modal" id="orderModal">
+        <div class="order-content">
+            <button class="modal-close" id="closeOrderModal">&times;</button>
+            <div class="modal-header">
+                <h3>Plotëso të dhënat për porosinë</h3>
+            </div>
+            <div id="orderSummary"></div>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="name">Emri dhe Mbiemri *</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefoni *</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Adresa e plotë *</label>
+                    <textarea id="address" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="city">Qyteti *</label>
+                    <input type="text" id="city" required>
+                </div>
+                <div class="form-group">
+                    <label for="payment">Metoda e pagesës *</label>
+                    <select id="payment" required>
+                        <option value="">Zgjidh metodën e pagesës</option>
+                        <option value="card">Kartelë krediti/debiti</option>
+                        <option value="bkt">BKT Pay</option>
+                        <option value="cash">Para në dorëzim</option>
+                    </select>
+                </div>
+                
+                <!-- Fusha për Kartelë (shfaqen vetëm kur zgjidhet "card") -->
+                <div id="cardFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="cardNumber">Numri i Kartelës *</label>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456">
+                    </div>
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label for="expiryDate">Data e Skadimit *</label>
+                            <input type="text" id="expiryDate" placeholder="MM/YY">
+                        </div>
+                        <div>
+                            <label for="cvv">CVV *</label>
+                            <input type="text" id="cvv" placeholder="123">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Shënime shtesë (opsionale)</label>
+                    <textarea id="notes" placeholder="Shënime për dërgesën, etj."></textarea>
+                </div>
+                <button type="submit" class="btn-add-cart" style="width: 100%; padding: 12px; background-color: #27ae60;">Përfundo Porosinë</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3>Shporta Juaj</h3>
+                <button class="modal-close" id="closeCartModal">&times;</button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Produktet në shportë do të shfaqen këtu -->
+            </div>
+            <div class="cart-total">
+                <span>Totali:</span>
+                <span class="cart-total-price" id="cartTotalPrice">0.00 €</span>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-add-cart" style="flex: 1; background-color: #e74c3c;" onclick="clearCart()">Pastro Shportën</button>
+                <button class="btn-add-cart" style="flex: 1; background-color: #2c3e50;" onclick="checkout()">Vazhdo me Pagesën</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Modal -->
+    <div class="wishlist-modal" id="wishlistModal">
+        <div class="wishlist-content">
+            <div class="wishlist-header">
+                <h3><i class="fas fa-heart" style="color: #e74c3c;"></i> Lista e Dëshirave</h3>
+                <button class="modal-close" id="closeWishlistModal">&times;</button>
+            </div>
+            <div class="wishlist-items" id="wishlistItems">
+                <!-- Produktet e preferuara do të shfaqen këtu -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="cart-notification success" id="cartNotification">
+        <i class="fas fa-check-circle"></i>
+        <div>
+            <strong>Produkti u shtua në shportë!</strong>
+            <div id="notificationMessage"></div>
+        </div>
+    </div>
+
+    <div class="cart-notification" id="wishlistNotification">
+        <i class="fas fa-heart"></i>
+        <div>
+            <strong>Lista e Dëshirave!</strong>
+            <div id="wishlistNotificationMessage"></div>
+        </div>
+    </div>
+
+    <!-- Pinguin AI Assistant -->
+    <div class="pinguin-ai" id="pinguinAI">
+        <div class="ai-button" onclick="toggleAI()">
+            <img src="assets/images/pinguin.png" alt="Pinguin AI">
+            <div class="pulse"></div>
+            <div class="message-bubble">Pyet Pinguinin! 🐧</div>
+        </div>
+        
+        <div class="ai-chat" id="aiChat">
+            <div class="ai-header">
+                <img src="assets/images/pinguin.png" alt="Pinguin AI">
+                <div class="ai-header-info">
+                    <h3>Pinguin AI Asistent</h3>
+                    <p>Pyet mua çdo gjë! 🐧</p>
+                </div>
+                <button onclick="toggleAI()">×</button>
+            </div>
+            
+            <div class="ai-messages" id="aiMessages">
+                <div class="message ai">
+                    <div class="message-content">
+                        Përshëndetje! Unë jam Pinguin AI Asistenti. 
+                        Pyet mua rreth produkteve, porosive, transportit, pagesave dhe gjithçka tjetër! 🐧
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-input">
+                <input type="text" id="aiQuestion" placeholder="Shkruaj pyetjen këtu..." onkeypress="if(event.key==='Enter') askAI()">
+                <button onclick="askAI()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            
+            <div class="quick-questions">
+                <span class="quick-question" onclick="askQuickQuestion('transport')">🚚 Transporti?</span>
+                <span class="quick-question" onclick="askQuickQuestion('payment')">💳 Pagesat?</span>
+                <span class="quick-question" onclick="askQuickQuestion('return')">↩️ Kthimet?</span>
+                <span class="quick-question" onclick="askQuickQuestion('discount')">🏷️ Zbritjet?</span>
+                <span class="quick-question" onclick="askQuickQuestion('products')">📦 Produktet?</span>
+                <span class="quick-question" onclick="askQuickQuestion('order')">🛒 Porositë?</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <img src="assets/images/pinguin.png" alt="Pinguin Shop" class="footer-logo" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+                <p>Pinguin Shop është dyqani juaj online i besueshëm për blerje të shpejta dhe të sigurta. Ne ofrojmë produkte cilësore me çmime të volitshme për të gjitha nevojat tuaja. Me seli në Prishtinë, ne jemi krenarë të shërbejmë klientët në të gjithë Kosovën.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Rreth Nesh</h4>
+                <ul>
+                    <li><a href="#" onclick="openPage('rreth'); return false;"><i class="fas fa-chevron-right"></i> Për Pinguin Shop</a></li>
+                    <li><a href="#" onclick="openPage('mission'); return false;"><i class="fas fa-chevron-right"></i> Misioni ynë</a></li>
+                    <li><a href="#" onclick="openPage('team'); return false;"><i class="fas fa-chevron-right"></i> Ekipa jonë</a></li>
+                    <li><a href="#" onclick="openPage('values'); return false;"><i class="fas fa-chevron-right"></i> Vlerat tona</a></li>
+                    <li><a href="#" onclick="openPage('blog'); return false;"><i class="fas fa-chevron-right"></i> Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Informacione</h4>
+                <ul>
+                    <li><a href="#" onclick="openPage('faq'); return false;"><i class="fas fa-chevron-right"></i> Pyetje të shpeshta</a></li>
+                    <li><a href="#" onclick="openPage('shipping'); return false;"><i class="fas fa-chevron-right"></i> Transporti dhe dorëzimi</a></li>
+                    <li><a href="#" onclick="openPage('returns'); return false;"><i class="fas fa-chevron-right"></i> Kthimet dhe rimbursimet</a></li>
+                    <li><a href="#" onclick="openPage('privacy'); return false;"><i class="fas fa-chevron-right"></i> Politika e privatësisë</a></li>
+                    <li><a href="#" onclick="openPage('terms'); return false;"><i class="fas fa-chevron-right"></i> Kushtet e përdorimit</a></li>
+                    <li><a href="#" onclick="openPage('cookies'); return false;"><i class="fas fa-chevron-right"></i> Politika e cookies</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Kontakt</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Rr. B, Prishtinë, Kosovë</li>
+                    <li><i class="fas fa-phone"></i> +383 49 123 456</li>
+                    <li><i class="fas fa-envelope"></i> info@pinguinshop.com</li>
+                    <li><i class="fas fa-clock"></i> Hën-Prem: 09:00 - 20:00</li>
+                    <li><i class="fas fa-clock"></i> Shtunë: 09:00 - 15:00</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Pinguin Shop. Të gjitha të drejtat e rezervuara. | 
+            <a href="#" onclick="openPage('privacy'); return false;">Privatësia</a> | 
+            <a href="#" onclick="openPage('terms'); return false;">Kushtet</a> | 
+            <a href="#" onclick="openPage('contact'); return false;">Kontakt</a> | 
+            <a href="#" onclick="openPage('sitemap'); return false;">Harta e faqes</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Variablat globale
+        let cart = JSON.parse(localStorage.getItem('pinguinshop_cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('pinguinshop_wishlist')) || [];
+        let currentOrderProduct = null;
+        let lastScroll = 0;
+        const header = document.getElementById('mainHeader');
+
+        // Funksioni për të marrë produkte nga API
+        async function fetchProducts(type = '', category = '', limit = 0) {
+            let url = 'api.php?action=get_products';
+            if (type) url += `&type=${type}`;
+            if (category) url += `&category=${category}`;
+            if (limit) url += `&limit=${limit}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.success) {
+                    return data.data;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                return [];
+            }
+        }
+
+        // Funksioni për të krijuar HTML-in e produktit
+        function createProductHTML(product) {
+            const isInWishlist = wishlist.some(item => item.id == product.id);
+            const discount = product.discount || product.discount_percent || 0;
+            const oldPrice = product.old_price || product.oldPrice || 0;
+            const imageUrl = product.image ? `assets/images/${product.image}` : 'assets/images/default.jpg';
+            const categorySlug = product.category_slug || product.category || '';
+            
+            return `
+                <div class="product-card" onclick="showProductDetails(${product.id})" data-id="${product.id}" data-category="${categorySlug}">
+                    <div class="product-image" onclick="event.stopPropagation()">
+                        ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+                        <div class="wishlist-badge ${isInWishlist ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${product.id})">
+                            <i class="${isInWishlist ? 'fas' : 'far'} fa-heart"></i>
+                        </div>
+                        <img src="${imageUrl}" alt="${product.name}" onerror="this.src='assets/images/default.jpg'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-desc">${product.description ? product.description.substring(0, 60) + '...' : ''}</div>
+                        <div class="product-price">
+                            <div class="current-price">${parseFloat(product.price).toFixed(2)} €</div>
+                            ${oldPrice > 0 ? `<div class="old-price">${parseFloat(oldPrice).toFixed(2)} €</div>` : ''}
+                        </div>
+                        <div class="product-actions" onclick="event.stopPropagation()">
+                            <button class="btn-add-cart" onclick="addToCart(${product.id})">
+                                <i class="fas fa-cart-plus"></i> Shto
+                            </button>
+                            <button class="btn-buy-now" onclick="buyNow(${product.id})">
+                                <i class="fas fa-bolt"></i> Blej
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Funksioni për të shfaqur detajet e produktit
+        async function showProductDetails(productId) {
+            try {
+                const response = await fetch(`api.php?action=get_product&id=${productId}`);
+                const data = await response.json();
+                if (data.success) {
+                    const product = data.data;
+                    const isInWishlist = wishlist.some(item => item.id == product.id);
+                    const imageUrl = product.image ? `assets/images/${product.image}` : 'assets/images/default.jpg';
+                    
+                    let specsHTML = '';
+                    
+                  const detailHTML = `
+    <div class="product-detail-grid">
+        <div class="product-detail-image">
+            <img src="${imageUrl}" alt="${product.name}">
+        </div>
+        <div class="product-detail-info">
+            <h2 style="color: #2d1b4e;">${product.name}</h2>
+            <div class="product-detail-category" style="color: #6b2d7a;">Kategoria: ${product.category_name || 'E panjohur'}</div>
+            <div class="product-detail-price">
+                <span class="product-detail-current" style="color: #ad3288;">${parseFloat(product.price).toFixed(2)} €</span>
+                ${product.old_price ? `<span class="product-detail-old" style="color: #999; text-decoration: line-through;">${parseFloat(product.old_price).toFixed(2)} €</span>` : ''}
+            </div>
+            <p style="color: #333333; margin-bottom: 20px;">${product.description || ''}</p>
+            
+            ${specsHTML}
+            
+            ${product.brand ? `<p style="color: #555555;"><strong>Brandi:</strong> ${product.brand}</p>` : ''}
+            
+            <div class="product-detail-actions">
+                <button class="btn-add-cart" onclick="addToCart(${product.id}); closeProductDetailModal();">
+                    <i class="fas fa-cart-plus"></i> Shto në Shportë
+                </button>
+                <button class="btn-add-cart" style="background-color: #2c3e50;" onclick="buyNow(${product.id}); closeProductDetailModal();">
+                    Blej Tani
+                </button>
+                <button class="btn-wishlist ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${product.id})">
+                    <i class="${isInWishlist ? 'fas' : 'far'} fa-heart"></i> 
+                    ${isInWishlist ? 'Në Listë' : 'Shto në Listë'}
+                </button>
+            </div>
+        </div>
+    </div>
+`;
+                    
+                    document.getElementById('productDetailContent').innerHTML = detailHTML;
+                    document.getElementById('productDetailModal').style.display = 'flex';
+                    document.getElementById('searchResults').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+            }
+        }
+
+        function closeProductDetailModal() {
+            document.getElementById('productDetailModal').style.display = 'none';
+        }
+
+        // Funksionet për të shfaqur produktet
+        async function displayDiscountProducts() {
+            const products = await fetchProducts('discount', '', 4);
+            const container = document.getElementById('discountProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte në zbritje</p>';
+            }
+        }
+
+        async function displayPopularProducts() {
+            const products = await fetchProducts('popular', '', 4);
+            const container = document.getElementById('popularProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte të kërkuara</p>';
+            }
+        }
+
+        async function displayCheapestProducts() {
+            const products = await fetchProducts('cheapest', '', 4);
+            const container = document.getElementById('cheapestProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte</p>';
+            }
+        }
+
+        async function displayNewProducts() {
+            const products = await fetchProducts('new', '', 4);
+            const container = document.getElementById('newProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte të reja</p>';
+            }
+        }
+
+        async function displayAllDiscountProducts() {
+            const products = await fetchProducts('discount');
+            const container = document.getElementById('discountModalProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte në zbritje</p>';
+            }
+        }
+
+        async function displayAllPopularProducts() {
+            const products = await fetchProducts('popular');
+            const container = document.getElementById('popularModalProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte të kërkuara</p>';
+            }
+        }
+
+        async function showCheapestProducts() {
+            const products = await fetchProducts('cheapest');
+            const container = document.getElementById('cheapestModalProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte</p>';
+            }
+            document.getElementById('cheapestModal').style.display = 'flex';
+        }
+
+        async function showNewProducts() {
+            const products = await fetchProducts('new', '', 8);
+            const container = document.getElementById('newModalProducts');
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte të reja</p>';
+            }
+            document.getElementById('newModal').style.display = 'flex';
+        }
+
+        async function displayProductsByCategory(category) {
+            const products = await fetchProducts('', category);
+            const container = document.getElementById('categoryModalProducts');
+            const title = document.getElementById('categoryModalTitle');
+            
+            title.textContent = `Produktet nga kategoria: ${getCategoryName(category)}`;
+            
+            if (products.length > 0) {
+                container.innerHTML = products.map(p => createProductHTML(p)).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nuk ka produkte në këtë kategori</p>';
+            }
+            document.getElementById('categoryModal').style.display = 'flex';
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'elektronike': 'Elektronikë',
+                'veshje': 'Veshje & Modë',
+                'kozmetike': 'Kozmetikë & Shëndet',
+                'kepuce': 'Këpucë & Çanta',
+                'sport-aktivitete': 'Sport & Aktivitete',
+                'stoli-ore': 'Stoli & Orë'
+            };
+            return categories[category] || category;
+        }
+
+        // Funksionet për kërkim
+        async function searchProducts(query) {
+            if (!query.trim()) return [];
+            
+            try {
+                const response = await fetch('api.php?action=get_products');
+                const data = await response.json();
+                if (data.success) {
+                    const searchTerm = query.toLowerCase();
+                    return data.data.filter(product => 
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        (product.description && product.description.toLowerCase().includes(searchTerm))
+                    );
+                }
+                return [];
+            } catch (error) {
+                console.error('Error searching products:', error);
+                return [];
+            }
+        }
+
+        async function displaySearchResults(results) {
+            const container = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                container.innerHTML = `<div class="search-result-item">Nuk u gjet asnjë produkt</div>`;
+                container.style.display = 'block';
+                return;
+            }
+            
+            container.innerHTML = results.slice(0, 5).map(product => `
+                <div class="search-result-item" onclick="showProductDetails(${product.id})">
+                    <div>
+                        <div class="search-result-title">${product.name}</div>
+                        <div class="search-result-desc">${product.description ? product.description.substring(0, 80) + '...' : ''}</div>
+                        <div class="search-result-price">${parseFloat(product.price).toFixed(2)} €</div>
+                        <div class="search-result-category">${getCategoryName(product.category)}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.style.display = 'block';
+        }
+
+        // Funksionet për Wishlist
+        async function toggleWishlist(productId) {
+            try {
+                const index = wishlist.findIndex(item => item.id == productId);
+                
+                if (index === -1) {
+                    const response = await fetch(`api.php?action=get_product&id=${productId}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const product = data.data;
+                        wishlist.push(product);
+                        showWishlistNotification(`"${product.name}" u shtua në listën e dëshirave!`);
+                    } else {
+                        showWishlistNotification('Produkti nuk u gjet!');
+                        return;
+                    }
+                } else {
+                    const productName = wishlist[index].name;
+                    wishlist.splice(index, 1);
+                    showWishlistNotification(`"${productName}" u hoq nga lista e dëshirave!`);
+                }
+                
+                localStorage.setItem('pinguinshop_wishlist', JSON.stringify(wishlist));
+                updateWishlistCount();
+                refreshAllProductCards();
+                
+                if (document.getElementById('wishlistModal').style.display === 'flex') {
+                    displayWishlistItems();
+                }
+            } catch (error) {
+                console.error('Error toggling wishlist:', error);
+                showWishlistNotification('Problem me lidhjen me serverin!');
+            }
+        }
+
+        function showWishlistNotification(message) {
+            const notification = document.getElementById('wishlistNotification');
+            const messageElement = document.getElementById('wishlistNotificationMessage');
+            
+            messageElement.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function updateWishlistCount() {
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+        }
+
+        // Funksioni për të shfaqur produktet në wishlist
+        async function displayWishlistItems() {
+            const container = document.getElementById('wishlistItems');
+            
+            if (wishlist.length === 0) {
+                container.innerHTML = '<div class="wishlist-empty"><i class="fas fa-heart" style="font-size: 48px; margin-bottom: 15px; color: #ffd966;"></i><br>Lista e dëshirave është e zbrazët</div>';
+                return;
+            }
+            
+            let html = '';
+            wishlist.forEach(product => {
+                const imageUrl = product.image ? `assets/images/${product.image}` : 'assets/images/default.jpg';
+                const discount = product.discount || 0;
+                const oldPrice = product.old_price || 0;
+                
+                html += `
+                    <div class="product-card" onclick="showProductDetails(${product.id})">
+                        <div class="product-image" onclick="event.stopPropagation()">
+                            ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+                            <div class="wishlist-badge active" onclick="event.stopPropagation(); toggleWishlist(${product.id})">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <img src="${imageUrl}" alt="${product.name}" onerror="this.src='assets/images/default.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">${product.name}</div>
+                            <div class="product-desc">${product.description ? product.description.substring(0, 60) + '...' : ''}</div>
+                            <div class="product-price">
+                                <div class="current-price">${parseFloat(product.price).toFixed(2)} €</div>
+                                ${oldPrice > 0 ? `<div class="old-price">${parseFloat(oldPrice).toFixed(2)} €</div>` : ''}
+                            </div>
+                            <div class="product-actions" onclick="event.stopPropagation()">
+                                <button class="btn-add-cart" onclick="addToCart(${product.id})">
+                                    <i class="fas fa-cart-plus"></i> Shto
+                                </button>
+                                <button class="btn-buy-now" onclick="buyNow(${product.id})">
+                                    <i class="fas fa-bolt"></i> Blej
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Funksion për të rifreskuar të gjitha kartat e produkteve
+        async function refreshAllProductCards() {
+            await displayDiscountProducts();
+            await displayPopularProducts();
+            await displayCheapestProducts();
+            await displayNewProducts();
+            
+            if (document.getElementById('discountModal').style.display === 'flex') {
+                await displayAllDiscountProducts();
+            }
+            if (document.getElementById('popularModal').style.display === 'flex') {
+                await displayAllPopularProducts();
+            }
+            if (document.getElementById('cheapestModal').style.display === 'flex') {
+                await showCheapestProducts();
+            }
+            if (document.getElementById('newModal').style.display === 'flex') {
+                await showNewProducts();
+            }
+        }
+
+        // Funksionet për shportë
+        async function addToCart(productId) {
+            try {
+                const response = await fetch(`api.php?action=get_product&id=${productId}`);
+                const data = await response.json();
+                if (data.success) {
+                    const product = data.data;
+                    const existingItem = cart.find(item => item.id == productId);
+                    
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1
+                        });
+                    }
+                    
+                    localStorage.setItem('pinguinshop_cart', JSON.stringify(cart));
+                    updateCartDisplay();
+                    showNotification(`"${product.name}" u shtua në shportë!`);
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+            }
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('cartNotification');
+            const messageElement = document.getElementById('notificationMessage');
+            
+            messageElement.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function buyNow(productId) {
+            addToCart(productId);
+            setTimeout(() => {
+                document.getElementById('cartModal').style.display = 'flex';
+            }, 500);
+        }
+
+        function saveCart() {
+            localStorage.setItem('pinguinshop_cart', JSON.stringify(cart));
+        }
+
+        function updateCartDisplay() {
+            const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cartCount').textContent = cartCount;
+            
+            const cartItemsContainer = document.getElementById('cartItems');
+            const cartTotalPrice = document.getElementById('cartTotalPrice');
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="cart-empty">Shporta juaj është e zbrazët</div>';
+                cartTotalPrice.textContent = '0.00 €';
+                return;
+            }
+            
+            let total = 0;
+            cartItemsContainer.innerHTML = cart.map(item => {
+                const itemTotal = parseFloat(item.price) * item.quantity;
+                total += itemTotal;
+                
+                return `
+                    <div class="cart-item">
+                        <img src="assets/images/${item.image || 'default.jpg'}" class="cart-item-image" onerror="this.src='assets/images/default.jpg'">
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">${item.name}</div>
+                            <div class="cart-item-price">${parseFloat(item.price).toFixed(2)} €</div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                        </div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            cartTotalPrice.textContent = total.toFixed(2) + ' €';
+        }
+
+        function updateQuantity(productId, newQuantity) {
+            if (newQuantity < 1) {
+                removeFromCart(productId);
+                return;
+            }
+            
+            const item = cart.find(item => item.id == productId);
+            if (item) {
+                item.quantity = newQuantity;
+                saveCart();
+                updateCartDisplay();
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id != productId);
+            saveCart();
+            updateCartDisplay();
+        }
+
+        function clearCart() {
+            if (confirm('Jeni i sigurt që doni të pastroni të gjitha produktet nga shporta?')) {
+                cart = [];
+                saveCart();
+                updateCartDisplay();
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Shporta juaj është e zbrazët!');
+                return;
+            }
+            
+            let orderSummaryHTML = `
+                <div class="order-summary">
+                    <h4>Përmbledhje e porosisë:</h4>
+            `;
+            
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = parseFloat(item.price) * item.quantity;
+                total += itemTotal;
+                orderSummaryHTML += `
+                    <div class="summary-item">
+                        <span>${item.name} x${item.quantity}</span>
+                        <span>${itemTotal.toFixed(2)} €</span>
+                    </div>
+                `;
+            });
+            
+            const shipping = total > 50 ? 0 : 3.99;
+            orderSummaryHTML += `
+                    <div class="summary-item">
+                        <span>Transporti</span>
+                        <span>${shipping.toFixed(2)} €</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Totali:</span>
+                        <span>${(total + shipping).toFixed(2)} €</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('orderSummary').innerHTML = orderSummaryHTML;
+            document.getElementById('cartModal').style.display = 'none';
+            document.getElementById('orderModal').style.display = 'flex';
+            currentOrderProduct = null;
+        }
+
+        // Funksioni për të hapur faqet statike
+        function openPage(page) {
+            const modalTitle = document.getElementById('pageModalTitle');
+            const modalContent = document.getElementById('pageModalContent');
+            
+            let title = '';
+            let content = '';
+            
+            switch(page) {
+                case 'rreth':
+                    title = 'Për Pinguin Shop';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Për Pinguin Shop</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Pinguin Shop u themelua në vitin 2020 me një vizion të qartë: të sjellim blerjet online në një nivel të ri në Kosovë. Emri "Pinguin" simbolizon qëndrueshmërinë, përshtatshmërinë dhe besueshmërinë - cilësi që ne përpiqemi t'i ofrojmë çdo klienti.</p>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Nga fillimet tona modeste në Prishtinë, sot kemi zgjeruar shërbimin tonë në të gjitha qytetet kryesore të Kosovës, duke ofruar produkte cilësore nga më shumë se 500 brand-e të njohura vendore dhe ndërkombëtare.</p>
+                    <p style="color: #666; line-height: 1.8;">Me mbi 10,000 klientë të kënaqur dhe rritje të vazhdueshme, ne vazhdojmë të përmirësojmë shërbimin tonë për të siguruar që çdo blerje të jetë një përvojë e këndshme dhe e sigurt.</p>`;
+                    break;
+                case 'mission':
+                    title = 'Misioni ynë';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Misioni ynë</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Misioni i Pinguin Shop është të ofrojmë një platformë blerjesh online të sigurt, të shpejtë dhe të përshtatshme për të gjithë qytetarët e Kosovës. Ne besojmë se blerjet online duhet të jenë të thjeshta, transparente dhe të kenë standardet më të larta të shërbimit ndaj klientit.</p>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Përmes teknologjisë dhe përkushtimit, ne synojmë të krijojmë një komunitet blerësish që vlerësojnë cilësinë, çmimet e drejta dhe shërbimin profesional. Angazhimi ynë për inovacion dhe përmirësim të vazhdueshëm na shtyn të jemi gjithmonë një hap përpara në plotësimin e nevojave të klientëve tanë.</p>`;
+                    break;
+                case 'team':
+                    title = 'Ekipa jonë';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Ekipa jonë</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Pas suksesit të Pinguin Shop qëndron një ekip i dedikuar profesionistësh të pasionuar pas teknologjisë dhe shërbimit ndaj klientit. Ekipi ynë përbëhet nga ekspertë të fushave të ndryshme: zhvillues, dizajnerë, specialistë marketingu dhe mbështetjeje për klientët.</p>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Me seli qendrore në Prishtinë, ekipi ynë punon çdo ditë për të siguruar që platforma jonë të jetë e përditësuar, produktet të jenë të cilësisë më të lartë dhe klientët të marrin përgjigje të shpejta për pyetjet e tyre. Bashkëpunimi dhe komunikimi i hapur janë vlerat që na bashkojnë dhe na bëjnë më të fortë.</p>`;
+                    break;
+                case 'values':
+                    title = 'Vlerat tona';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Vlerat tona</h2>
+                    <ul style="color: #666; line-height: 1.8; margin-left: 20px;">
+                        <li style="margin-bottom: 10px;"><strong>Besueshmëria:</strong> Ne mbajmë çdo premtim që japim dhe sigurojmë që produktet të jenë siç përshkruhen.</li>
+                        <li style="margin-bottom: 10px;"><strong>Transparenca:</strong> Çmime të qarta, pa kosto të fshehura dhe informacion të plotë për çdo produkt.</li>
+                        <li style="margin-bottom: 10px;"><strong>Cilësia:</strong> Përzgjedhje e kujdesshme e produkteve dhe partnerëve tanë.</li>
+                        <li style="margin-bottom: 10px;"><strong>Inovacioni:</strong> Përmirësim i vazhdueshëm i platformës dhe shërbimeve tona.</li>
+                        <li style="margin-bottom: 10px;"><strong>Përkushtimi ndaj klientit:</strong> Klientët tanë janë në qendër të gjithçkaje që bëjmë.</li>
+                    </ul>`;
+                    break;
+                case 'blog':
+                    title = 'Blog';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Blog-u ynë</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Mirësevini në blog-un e Pinguin Shop! Këtu do të gjeni artikuj interesantë rreth produkteve të reja, këshilla për blerje, trende të modës, teknologjisë dhe më shumë.</p>
+                    <div style="background: #f8f0ff; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                        <p style="color: #2d1b4e;"><i class="fas fa-newspaper" style="margin-right: 10px;"></i> Artikujt më të fundit:</p>
+                        <ul style="color: #666; margin-top: 10px; list-style: none;">
+                            <li style="margin-bottom: 8px;"><i class="fas fa-chevron-right" style="color: #ad3288; margin-right: 8px;"></i> "Si të zgjidhni laptop-in e duhur për nevojat tuaja"</li>
+                            <li style="margin-bottom: 8px;"><i class="fas fa-chevron-right" style="color: #ad3288; margin-right: 8px;"></i> "Trendet e modës për pranverë/verë 2026"</li>
+                            <li style="margin-bottom: 8px;"><i class="fas fa-chevron-right" style="color: #ad3288; margin-right: 8px;"></i> "5 këshilla për kujdesin e lëkurës gjatë verës"</li>
+                        </ul>
+                    </div>`;
+                    break;
+                case 'faq':
+                    title = 'Pyetje të shpeshta';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Pyetje të shpeshta</h2>
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #2d1b4e; font-weight: 600;"><i class="fas fa-question-circle" style="color: #ad3288; margin-right: 10px;"></i> Sa kohë zgjat dorëzimi?</p>
+                        <p style="color: #666; margin-left: 30px;">Dorëzimi zakonisht zgjat 2-4 ditë pune për Prishtinë dhe qytetet kryesore, dhe 3-5 ditë pune për zonat tjera.</p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #2d1b4e; font-weight: 600;"><i class="fas fa-question-circle" style="color: #ad3288; margin-right: 10px;"></i> Sa kushton transporti?</p>
+                        <p style="color: #666; margin-left: 30px;">Transporti është falas për porosi mbi 50€. Për porosi nën 50€, kostoja e transportit është 3.99€.</p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #2d1b4e; font-weight: 600;"><i class="fas fa-question-circle" style="color: #ad3288; margin-right: 10px;"></i> Cilat metoda pagese pranoni?</p>
+                        <p style="color: #666; margin-left: 30px;">Pranojmë pagesa me kartelë krediti/debiti, BKT Pay, dhe para në dorëzim.</p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #2d1b4e; font-weight: 600;"><i class="fas fa-question-circle" style="color: #ad3288; margin-right: 10px;"></i> A mund ta kthej produktin?</p>
+                        <p style="color: #666; margin-left: 30px;">Po, ju keni të drejtë të ktheni produktin brenda 14 ditëve nga marrja e tij, në gjendje të njëjtë siç e keni marrë.</p>
+                    </div>`;
+                    break;
+                case 'shipping':
+                    title = 'Transporti dhe dorëzimi';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Transporti dhe dorëzimi</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Ne ofrojmë transport të shpejtë dhe të sigurt për të gjitha porositë tuaja. Dorëzimi bëhet përmes kurierëve tanë partnerë, të cilët garantojnë që produktet tuaja të arrijnë në kohë dhe në gjendje të përsosur.</p>
+                    <p style="color: #2d1b4e; font-weight: 600; margin-top: 20px;">Kohët e dorëzimit:</p>
+                    <ul style="color: #666; margin-left: 20px; margin-bottom: 15px;">
+                        <li>Prishtinë: 1-2 ditë pune</li>
+                        <li>Qytetet kryesore: 2-3 ditë pune</li>
+                        <li>Zonat tjera: 3-5 ditë pune</li>
+                    </ul>
+                    <p style="color: #2d1b4e; font-weight: 600;">Tarifat e transportit:</p>
+                    <ul style="color: #666; margin-left: 20px;">
+                        <li>Porosi mbi 50€: Transport FALAS</li>
+                        <li>Porosi nën 50€: 3.99€</li>
+                    </ul>`;
+                    break;
+                case 'returns':
+                    title = 'Kthimet dhe rimbursimet';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Kthimet dhe rimbursimet</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Ne duam që ju të jeni të kënaqur me blerjet tuaja. Nëse për ndonjë arsye nuk jeni të kënaqur me produktin, ju keni të drejtë ta ktheni atë brenda 14 ditëve.</p>
+                    <p style="color: #2d1b4e; font-weight: 600; margin-top: 20px;">Kushtet për kthim:</p>
+                    <ul style="color: #666; margin-left: 20px; margin-bottom: 15px;">
+                        <li>Produkti duhet të jetë në gjendje të njëjtë siç e keni marrë</li>
+                        <li>Ambalazhi origjinal duhet të jetë i paprekur</li>
+                                                <li>Me etiketat origjinale dhe paketimin fillestar</li>
+                        <li>Bashkë me faturën ose konfirmimin e porosisë</li>
+                    </ul>
+                    <p style="color: #666; line-height: 1.8;">Për të nisur një kthim, na kontaktoni në info@pinguinshop.com ose në numrin +383 49 123 456.</p>`;
+                    break;
+                case 'privacy':
+                    title = 'Politika e privatësisë';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Politika e privatësisë</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Në Pinguin Shop, privatësia juaj është e rëndësishme për ne. Kjo politikë shpjegon se si mbledhim, përdorim dhe mbrojmë të dhënat tuaja personale kur përdorni faqen tonë të internetit dhe shërbimet tona.</p>
+                    <p style="color: #2d1b4e; font-weight: 600; margin-top: 20px;">Çfarë të dhënash mbledhim?</p>
+                    <ul style="color: #666; margin-left: 20px; margin-bottom: 15px;">
+                        <li>Emrin dhe mbiemrin</li>
+                        <li>Adresën e email-it</li>
+                        <li>Numrin e telefonit</li>
+                        <li>Adresën e dorëzimit</li>
+                        <li>Historinë e porosive</li>
+                    </ul>
+                    <p style="color: #2d1b4e; font-weight: 600;">Si i përdorim të dhënat?</p>
+                    <ul style="color: #666; margin-left: 20px; margin-bottom: 15px;">
+                        <li>Për të përpunuar porositë tuaja</li>
+                        <li>Për të komunikuar me ju rreth porosive</li>
+                        <li>Për të përmirësuar shërbimet tona</li>
+                        <li>Për të dërguar oferta dhe promocione (vetëm me lejen tuaj)</li>
+                    </ul>
+                    <p style="color: #666; line-height: 1.8;">Të dhënat tuaja nuk shiten ose shpërndahen palëve të treta pa pëlqimin tuaj, përveç rasteve kur kërkohet me ligj.</p>`;
+                    break;
+                case 'terms':
+                    title = 'Kushtet e përdorimit';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Kushtet e përdorimit</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Duke përdorur faqen tonë të internetit dhe duke bërë porosi, ju pranoni këto kushte të përdorimit. Ju lutemi lexoni me kujdes para se të përdorni shërbimet tona.</p>
+                    <p style="color: #2d1b4e; font-weight: 600; margin-top: 20px;">Llogaria e përdoruesit</p>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Ju jeni përgjegjës për ruajtjen e konfidencialitetit të llogarisë dhe fjalëkalimit tuaj. Të gjitha aktivitetet që ndodhin në llogarinë tuaj janë përgjegjësia juaj.</p>
+                    <p style="color: #2d1b4e; font-weight: 600;">Porositë dhe pagesat</p>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Të gjitha çmimet janë në Euro dhe përfshijnë TVSH-në. Ne rezervojmë të drejtën të ndryshojmë çmimet në çdo kohë, por çmimi i konfirmuar në momentin e porosisë mbetet i vlefshëm.</p>
+                    <p style="color: #2d1b4e; font-weight: 600;">Anulimi i porosisë</p>
+                    <p style="color: #666; line-height: 1.8;">Ju mund të anuloni porosinë tuaj brenda 24 orëve nga konfirmimi, pa asnjë kosto. Pas këtij afati, porosia konsiderohet e nisur dhe mund të aplikohen kushtet e kthimit.</p>`;
+                    break;
+                case 'cookies':
+                    title = 'Politika e cookies';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Politika e cookies</h2>
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">Faqja jonë e internetit përdor cookies për të përmirësuar përvojën tuaj të shfletimit. Cookies janë skedarë të vegjël teksti që ruhen në pajisjen tuaj kur vizitoni faqen tonë.</p>
+                    <p style="color: #2d1b4e; font-weight: 600; margin-top: 20px;">Llojet e cookies që përdorim:</p>
+                    <ul style="color: #666; margin-left: 20px; margin-bottom: 15px;">
+                        <li><strong>Cookies esencialë:</strong> Të nevojshëm për funksionimin e faqes</li>
+                        <li><strong>Cookies funksionalë:</strong> Mbajnë mend preferencat tuaja</li>
+                        <li><strong>Cookies analitikë:</strong> Na ndihmojnë të kuptojmë se si përdoret faqja</li>
+                        <li><strong>Cookies reklamimi:</strong> Përdoren për të personalizuar reklamat</li>
+                    </ul>
+                    <p style="color: #666; line-height: 1.8;">Ju mund të kontrolloni dhe menaxhoni cookies përmes settings të shfletuesit tuaj. Çaktivizimi i cookies mund të ndikojë në funksionalitetin e faqes.</p>`;
+                    break;
+                case 'sitemap':
+                    title = 'Harta e faqes';
+                    content = `<h2 style="color: #2d1b4e; margin-bottom: 20px;">Harta e faqes</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div>
+                            <p style="color: #2d1b4e; font-weight: 600; margin-bottom: 10px;">Faqet kryesore</p>
+                            <ul style="color: #666; list-style: none;">
+                                <li><i class="fas fa-home" style="color: #ad3288; margin-right: 8px;"></i> Ballina</li>
+                                <li><i class="fas fa-tags" style="color: #ad3288; margin-right: 8px;"></i> Produktet</li>
+                                <li><i class="fas fa-star" style="color: #ad3288; margin-right: 8px;"></i> Në zbritje</li>
+                                <li><i class="fas fa-clock" style="color: #ad3288; margin-right: 8px;"></i> Produktet e reja</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p style="color: #2d1b4e; font-weight: 600; margin-bottom: 10px;">Kategoritë</p>
+                            <ul style="color: #666; list-style: none;">
+                                <li><i class="fas fa-laptop" style="color: #ad3288; margin-right: 8px;"></i> Elektronikë</li>
+                                <li><i class="fas fa-tshirt" style="color: #ad3288; margin-right: 8px;"></i> Veshje & Modë</li>
+                                <li><i class="fas fa-shoe-prints" style="color: #ad3288; margin-right: 8px;"></i> Këpucë & Çanta</li>
+                                <li><i class="fas fa-clock" style="color: #ad3288; margin-right: 8px;"></i> Stoli & Orë</li>
+                            </ul>
+                        </div>
+                    </div>`;
+                    break;
+                default:
+                    title = 'Faqja nuk u gjet';
+                    content = '<p style="color: #666;">Faqja që kërkoni nuk ekziston.</p>';
+            }
+            
+            modalTitle.textContent = title;
+            modalContent.innerHTML = content;
+            document.getElementById('pageModal').style.display = 'flex';
+        }
+
+        function changeLogo() {
+            const logoImg = document.getElementById('headerLogo');
+            if (logoImg.src.includes('pinguin.png')) {
+                
+            } else {
+                logoImg.src = 'assets/images/pinguin.png';
+            }
+        }
+
+        // Funksioni për menunë dropdown
+        function toggleUserMenu(event) {
+            event.preventDefault();
+            const menu = document.getElementById('userMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Mbyll menunë kur klikon jashtë
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('userMenu');
+            const dropdown = document.querySelector('.dropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                if (menu) menu.style.display = 'none';
+            }
+        });
+
+        // Pinguin AI Functions
+        function toggleAI() {
+            const aiChat = document.getElementById('aiChat');
+            aiChat.classList.toggle('show');
+        }
+
+        function addMessage(message, sender) {
+            const messagesContainer = document.getElementById('aiMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-content">${message}</div>`;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            const messagesContainer = document.getElementById('aiMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="ai-typing">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typingDiv = document.getElementById('typingIndicator');
+            if (typingDiv) typingDiv.remove();
+        }
+
+        function askAI() {
+            const questionInput = document.getElementById('aiQuestion');
+            const question = questionInput.value.trim();
+            
+            if (!question) return;
+            
+            addMessage(question, 'user');
+            questionInput.value = '';
+            
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                const answer = getAIResponse(question);
+                addMessage(answer, 'ai');
+            }, 1000);
+        }
+
+        function askQuickQuestion(type) {
+            let question = '';
+            switch(type) {
+                case 'transport':
+                    question = 'Si funksionon transporti?';
+                    break;
+                case 'payment':
+                    question = 'Cilat metoda pagese pranoni?';
+                    break;
+                case 'return':
+                    question = 'Si mund t\'i kthej produktet?';
+                    break;
+                case 'discount':
+                    question = 'A ka zbritje aktuale?';
+                    break;
+                case 'products':
+                    question = 'Çfarë produkte keni?';
+                    break;
+                case 'order':
+                    question = 'Si të bëj një porosi?';
+                    break;
+                default:
+                    question = type;
+            }
+            
+            document.getElementById('aiQuestion').value = question;
+            askAI();
+        }
+
+        function getAIResponse(question) {
+            const q = question.toLowerCase();
+            
+            if (q.includes('transport') || q.includes('dërges') || q.includes('sa kushton')) {
+                return "🚚 Transporti është falas për porosi mbi 50€, përndryshe kushton 3.99€. Dorëzimi zgjat 2-4 ditë pune në të gjithë Kosovën!";
+            }
+            else if (q.includes('pages') || q.includes('paguaj') || q.includes('kartel')) {
+                return "💳 Pranojmë pagesa me kartelë krediti/debiti, BKT Pay dhe para në dorëzim. Të gjitha pagesat janë të sigurta!";
+            }
+            else if (q.includes('kthim') || q.includes('rikthej')) {
+                return "↩️ Ju keni të drejtë t'i ktheni produktet brenda 14 ditëve nga marrja, në gjendje të njëjtë siç i keni marrë. Na kontaktoni në info@pinguinshop.com për më shumë!";
+            }
+            else if (q.includes('zbritje') || q.includes('sale') || q.includes('oferta')) {
+                return "🏷️ Aktualisht kemi zbritje deri në 70% për shumë produkte! Shikoni seksionin 'Në zbritje' për më shumë.";
+            }
+            else if (q.includes('produkt') || q.includes('keni')) {
+                return "📦 Kemi një gamë të gjerë produktesh: Elektronikë, Veshje, Këpucë, Stoli, Sport dhe Kozmetikë. Mund të kërkoni për produktin që ju intereson!";
+            }
+            else if (q.includes('porosi') || q.includes('blej')) {
+                return "🛒 Për të bërë një porosi, shtoni produktin në shportë, pastaj klikoni 'Vazhdo me Pagesën' dhe plotësoni të dhënat. Do të kontaktoheni për konfirmim!";
+            }
+            else if (q.includes('llogari') || q.includes('regjistrim')) {
+                return "👤 Për të krijuar llogari, klikoni tek 'Llogaria' dhe pastaj 'Regjistrohu'. Është falas dhe shumë i shpejtë!";
+            }
+            else if (q.includes('kontakt') || q.includes('telefon') || q.includes('email')) {
+                return "📞 Na kontaktoni në: info@pinguinshop.com ose në numrin +383 49 123 456. Jemi në dispozicion Hën-Prem 09:00-20:00!";
+            }
+            else if (q.includes('pinguin') || q.includes('asistent')) {
+                return "🐧 Përshëndetje! Unë jam Pinguin AI Asistenti, këtu për të të ndihmuar me çdo pyetje rreth blerjeve në Pinguin Shop!";
+            }
+            else {
+                return "Faleminderit për pyetjen! Për më shumë informacion, na kontaktoni në info@pinguinshop.com ose shikoni seksionin 'Pyetje të shpeshta' në footer. 🐧";
+            }
+        }
+
+        // Scroll detection
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                header.classList.add('hidden');
+            } else {
+                header.classList.remove('hidden');
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Inicializimi
+        document.addEventListener('DOMContentLoaded', function() {
+            displayDiscountProducts();
+            displayPopularProducts();
+            displayCheapestProducts();
+            displayNewProducts();
+            displayAllDiscountProducts();
+            displayAllPopularProducts();
+            
+            updateCartDisplay();
+            updateWishlistCount();
+            
+            // Search
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', async function() {
+                const results = await searchProducts(this.value);
+                displaySearchResults(results);
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-bar')) {
+                    document.getElementById('searchResults').style.display = 'none';
+                }
+            });
+            
+            // Butonat
+            document.getElementById('showMoreDiscount').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('discountModal').style.display = 'flex';
+            });
+            
+            document.getElementById('showMorePopular').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('popularModal').style.display = 'flex';
+            });
+            
+            document.getElementById('cartButton').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('cartModal').style.display = 'flex';
+            });
+            
+            document.getElementById('wishlistButton').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('wishlistModal').style.display = 'flex';
+                displayWishlistItems();
+            });
+            
+            // Kategoritë
+            document.querySelectorAll('.categories-list a').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.getAttribute('data-category');
+                    displayProductsByCategory(category);
+                });
+            });
+            
+            // Mbyll modals
+            const closeButtons = [
+                'closeDiscountModal', 'closePopularModal', 'closeCategoryModal',
+                'closeCheapestModal', 'closeNewModal', 'closeOrderModal',
+                'closeCartModal', 'closeWishlistModal', 'closeProductDetailModal',
+                'closePageModal'
+            ];
+            
+            closeButtons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        if (id === 'closeOrderModal') {
+                            document.getElementById('orderModal').style.display = 'none';
+                            document.getElementById('orderForm').reset();
+                        } else if (id === 'closeProductDetailModal') {
+                            document.getElementById('productDetailModal').style.display = 'none';
+                        } else if (id === 'closePageModal') {
+                            document.getElementById('pageModal').style.display = 'none';
+                        } else {
+                            const modalId = id.replace('close', '').replace('Modal', '') + 'Modal';
+                            const modal = document.getElementById(modalId);
+                            if (modal) modal.style.display = 'none';
+                        }
+                    });
+                }
+            });
+            
+            // Mbyll modals kur klikohet jashtë
+            window.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal') || 
+                    e.target.classList.contains('wishlist-modal') || 
+                    e.target.classList.contains('order-modal') || 
+                    e.target.classList.contains('cart-modal') ||
+                    e.target.classList.contains('product-detail-modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+            
+            // Payment method
+            document.getElementById('payment').addEventListener('change', function() {
+                const cardFields = document.getElementById('cardFields');
+                cardFields.style.display = this.value === 'card' ? 'block' : 'none';
+                if (this.value !== 'card') {
+                    document.getElementById('cardNumber').value = '';
+                    document.getElementById('expiryDate').value = '';
+                    document.getElementById('cvv').value = '';
+                }
+            });
+            
+            document.getElementById('cardFields').style.display = 'none';
+            
+            // Order form
+            document.getElementById('orderForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const address = document.getElementById('address').value;
+                const city = document.getElementById('city').value;
+                const payment = document.getElementById('payment').value;
+                const notes = document.getElementById('notes').value;
+                
+                if (!name || !email || !phone || !address || !city || !payment) {
+                    alert('Ju lutemi plotësoni të gjitha fushat e detyrueshme!');
+                    return;
+                }
+                
+                if (payment === 'card') {
+                    const cardNumber = document.getElementById('cardNumber').value;
+                    const expiryDate = document.getElementById('expiryDate').value;
+                    const cvv = document.getElementById('cvv').value;
+                    
+                    if (!cardNumber || !expiryDate || !cvv) {
+                        alert('Ju lutemi plotësoni të dhënat e kartelës!');
+                        return;
+                    }
+                    
+                    if (cardNumber.replace(/\s/g, '').length < 16) {
+                        alert('Numri i kartelës është i pasaktë!');
+                        return;
+                    }
+                }
+                
+                let totalAmount = 0;
+                if (currentOrderProduct) {
+                    totalAmount = parseFloat(currentOrderProduct.price);
+                } else {
+                    cart.forEach(item => {
+                        totalAmount += parseFloat(item.price) * item.quantity;
+                    });
+                }
+                
+                const shipping = totalAmount > 50 ? 0 : 3.99;
+                const finalTotal = totalAmount + shipping;
+                
+                // Krijo objektin e porosisë
+                const orderData = {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    address: address,
+                    city: city,
+                    payment: payment,
+                    notes: notes,
+                    products: currentOrderProduct ? [currentOrderProduct] : cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity
+                    })),
+                    total: finalTotal
+                };
+                
+                try {
+                    // Dërgo porosinë në server
+                    const response = await fetch('api.php?action=save_order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('✅ POROSIA U KONFIRMUA ME SUKSES!\n\n' +
+                              'Të dhënat e porosisë:\n' +
+                              '─────────────────\n' +
+                              `Emri: ${name}\n` +
+                              `Email: ${email}\n` +
+                              `Telefoni: ${phone}\n` +
+                              `Adresa: ${address}, ${city}\n` +
+                              `Pagesa: ${payment === 'card' ? 'Kartelë' : payment === 'bkt' ? 'BKT Pay' : 'Para në dorëzim'}\n` +
+                              (notes ? `Shënime: ${notes}\n` : '') +
+                              '─────────────────\n' +
+                              `Transporti: ${shipping === 0 ? 'Falas' : shipping.toFixed(2) + ' €'}\n` +
+                              `Totali: ${finalTotal.toFixed(2)} €\n` +
+                              '─────────────────\n' +
+                              'Do të kontaktoheni së shpejti për konfirmim!\n\n' +
+                              'Faleminderit që zgjodhët Pinguin Shop! 🐧');
+                        
+                        document.getElementById('orderForm').reset();
+                        document.getElementById('orderModal').style.display = 'none';
+                        document.getElementById('cardFields').style.display = 'none';
+                        
+                        if (currentOrderProduct === null && cart.length > 0) {
+                            cart = [];
+                            saveCart();
+                            updateCartDisplay();
+                        }
+                        
+                        currentOrderProduct = null;
+                    } else {
+                        alert('Gabim gjatë regjistrimit të porosisë: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error saving order:', error);
+                    alert('Gabim në lidhje me serverin! Porosia nuk u regjistrua.');
+                }
+            });
+
+            // Konfigurimi i slider-it
+            const sliderWrapper = document.getElementById('sliderWrapper');
+            const slides = document.querySelectorAll('.slide');
+            const sliderNav = document.getElementById('sliderNav');
+            const sliderCounter = document.getElementById('sliderCounter');
+            
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            let slideInterval;
+            let isTransitioning = false;
+            
+            // Krijo pikat (dots)
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+                dot.setAttribute('onclick', `goToSlide(${i})`);
+                sliderNav.appendChild(dot);
+            }
+            
+            const dots = document.querySelectorAll('.slider-dot');
+            
+            // Funksioni për të përditësuar slider-in
+            function updateSlider(index) {
+                if (isTransitioning) return;
+                
+                isTransitioning = true;
+                currentSlide = index;
+                
+                sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+                
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentSlide);
+                });
+                
+                sliderCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+                
+                const currentContent = slides[currentSlide].querySelector('.slide-content');
+                if (currentContent) {
+                    currentContent.style.animation = 'none';
+                    currentContent.offsetHeight;
+                    currentContent.style.animation = 'contentFadeIn 1s ease';
+                }
+                
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 800);
+            }
+            
+            // Funksioni për slide-in e ardhshëm
+            window.nextSlide = function() {
+                if (isTransitioning) return;
+                const next = (currentSlide + 1) % totalSlides;
+                updateSlider(next);
+                resetInterval();
+            };
+            
+            // Funksioni për slide-in e kaluar
+            window.prevSlide = function() {
+                if (isTransitioning) return;
+                const prev = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateSlider(prev);
+                resetInterval();
+            };
+            
+            // Funksioni për të shkuar te një slide specifik
+            window.goToSlide = function(index) {
+                if (isTransitioning) return;
+                updateSlider(index);
+                resetInterval();
+            };
+            
+            // Reset interval
+            function resetInterval() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(window.nextSlide, 3000);
+            }
+            
+            // Nis slider-in
+            updateSlider(0);
+            resetInterval();
+            
+            // Pause on hover
+            sliderWrapper.addEventListener('mouseenter', () => {
+                clearInterval(slideInterval);
+            });
+            
+            sliderWrapper.addEventListener('mouseleave', () => {
+                resetInterval();
+            });
+            
+            // Touch events për mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            sliderWrapper.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                clearInterval(slideInterval);
+            });
+            
+            sliderWrapper.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchStartX - touchEndX > 50) {
+                    window.nextSlide();
+                } else if (touchEndX - touchStartX > 50) {
+                    window.prevSlide();
+                               } else if (touchEndX - touchStartX > 50) {
+                    window.prevSlide();
+                }
+                resetInterval();
+            });
+            
+            // Logo animation
+            setInterval(changeLogo, 5000);
+        });
+
+        // Funksionet globale
+        window.addToCart = addToCart;
+        window.buyNow = buyNow;
+        window.toggleWishlist = toggleWishlist;
+        window.showProductDetails = showProductDetails;
+        window.closeProductDetailModal = closeProductDetailModal;
+        window.showCheapestProducts = showCheapestProducts;
+        window.showNewProducts = showNewProducts;
+        window.openPage = openPage;
+        window.toggleAI = toggleAI;
+        window.askAI = askAI;
+        window.askQuickQuestion = askQuickQuestion;
+        window.updateQuantity = updateQuantity;
+        window.removeFromCart = removeFromCart;
+        window.clearCart = clearCart;
+        window.checkout = checkout;
+    </script>
 </body>
 </html>
